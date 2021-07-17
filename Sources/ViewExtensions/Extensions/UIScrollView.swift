@@ -7,7 +7,7 @@
 
 import UIKit
 
-extension UIScrollView {
+public extension UIScrollView {
 
     func scrollToTop() {
         var newOffset = contentOffset

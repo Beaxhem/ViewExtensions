@@ -7,7 +7,7 @@
 
 import UIKit
 
-extension UIView {
+public extension UIView {
 
     func fit(into view: UIView) {
         view.translatesAutoresizingMaskIntoConstraints = false

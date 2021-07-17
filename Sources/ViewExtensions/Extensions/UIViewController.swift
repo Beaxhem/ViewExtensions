@@ -7,7 +7,7 @@
 
 import UIKit
 
-extension UIViewController {
+public extension UIViewController {
 
     func move<T: UIViewController>(to parent: T, viewPath: KeyPath<T, UIView> = \.view) {
         parent.addChild(self)
@@ -15,7 +15,7 @@ extension UIViewController {
         didMove(toParent: parent)
     }
 
-    public static func instantiate() -> Self {
+    static func instantiate() -> Self {
         return Self.init(nibName: Self.reuseIdentifier, bundle: nil)
     }
 
