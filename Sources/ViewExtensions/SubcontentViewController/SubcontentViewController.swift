@@ -18,17 +18,17 @@ open class SubcontentViewController: UIViewController {
 
     private static let animationDuration: TimeInterval = 0.2
 
-    @IBOutlet weak var collectionView: UICollectionView!
-    @IBOutlet weak var topView: UIView!
+    @IBOutlet public weak var collectionView: UICollectionView!
+    @IBOutlet public weak var topView: UIView!
     @IBOutlet weak var topViewHeightConstraint: NSLayoutConstraint!
 
     private var container: UIViewController!
     private var topViewContent: TopReachObserving!
     private var isTopReached = false
 
-    var disposeBag: DisposeBag?
+    public var disposeBag: DisposeBag?
 
-    init() {
+    public init() {
         super.init(nibName: SubcontentViewController.reuseIdentifier, bundle: nil)
     }
 
@@ -56,7 +56,7 @@ open class SubcontentViewController: UIViewController {
         }
     }
 
-    func getTopView() -> TopReachObserving {
+    public func getTopView() -> TopReachObserving {
         fatalError("Not implemented method 'topView(for:)'")
     }
 
