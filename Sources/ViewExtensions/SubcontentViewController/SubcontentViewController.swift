@@ -14,7 +14,7 @@ public enum TopViewState {
     case full
 }
 
-public class SubcontentViewController: UIViewController {
+open class SubcontentViewController: UIViewController {
 
     private static let animationDuration: TimeInterval = 0.2
 
@@ -32,7 +32,7 @@ public class SubcontentViewController: UIViewController {
         super.init(nibName: SubcontentViewController.reuseIdentifier, bundle: nil)
     }
 
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
