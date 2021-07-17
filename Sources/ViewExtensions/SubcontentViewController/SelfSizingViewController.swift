@@ -7,7 +7,7 @@
 
 import UIKit
 
-public class SelfSizingViewController: UIViewController {
+open class SelfSizingViewController: UIViewController {
 
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
