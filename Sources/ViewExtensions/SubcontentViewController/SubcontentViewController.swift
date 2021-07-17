@@ -33,7 +33,7 @@ open class SubcontentViewController: UIViewController {
     }
 
     required public init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        super.init(nibName: SubcontentViewController.reuseIdentifier, bundle: .module)
     }
 
     open override func viewDidLoad() {
