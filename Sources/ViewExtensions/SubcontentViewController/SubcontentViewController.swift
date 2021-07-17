@@ -28,7 +28,7 @@ open class SubcontentViewController: UIViewController {
 
     public var disposeBag: DisposeBag?
 
-    open init() {
+    public init() {
         super.init(nibName: SubcontentViewController.reuseIdentifier, bundle: nil)
     }
 
