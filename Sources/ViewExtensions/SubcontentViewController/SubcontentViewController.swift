@@ -28,7 +28,7 @@ open class SubcontentViewController: UIViewController {
 
     public var disposeBag: DisposeBag?
 
-    public init() {
+    open init() {
         super.init(nibName: SubcontentViewController.reuseIdentifier, bundle: nil)
     }
 
@@ -48,7 +48,7 @@ open class SubcontentViewController: UIViewController {
         setupBindings()
     }
 
-    public override func preferredContentSizeDidChange(forChildContentContainer container: UIContentContainer) {
+    open override func preferredContentSizeDidChange(forChildContentContainer container: UIContentContainer) {
         super.preferredContentSizeDidChange(forChildContentContainer: container)
 
         if (container as? SelfSizingViewController) != nil {

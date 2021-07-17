@@ -9,7 +9,7 @@ import UIKit
 
 open class SelfSizingViewController: UIViewController {
 
-    public override func viewDidLayoutSubviews() {
+    open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         calculatePreferredSize()
     }
@@ -23,7 +23,7 @@ open class SelfSizingViewController: UIViewController {
         }
     }
 
-    public override func preferredContentSizeDidChange(forChildContentContainer container: UIContentContainer) {
+    open override func preferredContentSizeDidChange(forChildContentContainer container: UIContentContainer) {
         super.preferredContentSizeDidChange(forChildContentContainer: container)
         calculatePreferredSize()
     }
