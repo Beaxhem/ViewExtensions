@@ -36,7 +36,7 @@ open class SubcontentViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public override func viewDidLoad() {
+    open override func viewDidLoad() {
         super.viewDidLoad()
         
         navigationController?.navigationBar.isHidden = true
@@ -56,7 +56,7 @@ open class SubcontentViewController: UIViewController {
         }
     }
 
-    public func getTopView() -> TopReachObserving {
+    open func getTopView() -> TopReachObserving {
         fatalError("Not implemented method 'topView(for:)'")
     }
 
