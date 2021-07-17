@@ -29,7 +29,7 @@ open class SubcontentViewController: UIViewController {
     public var disposeBag: DisposeBag?
 
     public init() {
-        super.init(nibName: SubcontentViewController.reuseIdentifier, bundle: nil)
+        super.init(nibName: SubcontentViewController.reuseIdentifier, bundle: .module)
     }
 
     required public init?(coder: NSCoder) {
