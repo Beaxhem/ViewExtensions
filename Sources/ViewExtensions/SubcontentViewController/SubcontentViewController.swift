@@ -91,8 +91,9 @@ private extension SubcontentViewController {
                     onNext: { owner, _ in
 
                         let updateState: (TopViewState) -> () = {
-                            if owner.topViewContent.topReachState != $0 {
-                                owner.topViewContent.topReachState = $0
+                            if let state = try? owner.topViewContent.topReachState.value(),
+                               state != $0 {
+                                owner.topViewContent.topReachState.onNext($0)
                             }
                         }
                         let offset = owner.collectionView.contentOffset.y

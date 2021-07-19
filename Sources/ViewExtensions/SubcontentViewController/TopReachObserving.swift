@@ -6,9 +6,10 @@
 //
 
 import UIKit
+import RxSwift
 
 public protocol TopReachObserving: UIViewController {
 
-    var topReachState: TopViewState? { get set }
+    var topReachState: BehaviorSubject<TopViewState> { get set }
 
 }
