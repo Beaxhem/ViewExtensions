@@ -12,6 +12,10 @@ import RxDataSources
 public enum TopViewState {
     case compact
     case full
+
+    public func toggle() -> TopViewState {
+        self == .compact ? .full : .compact
+    }
 }
 
 open class SubcontentViewController: UIViewController {
@@ -23,9 +27,9 @@ open class SubcontentViewController: UIViewController {
     @IBOutlet weak var topViewHeightConstraint: NSLayoutConstraint!
 
     private var container: UIViewController!
-    private var topViewContent: TopReachObserving!
     private var isTopReached = false
 
+    public var topViewContent: TopReachObserving!
     public var disposeBag: DisposeBag?
 
     public init() {
@@ -96,8 +100,8 @@ private extension SubcontentViewController {
                                 owner.topViewContent.topReachState.onNext($0)
                             }
                         }
-                        let offset = owner.collectionView.contentOffset.y
 
+                        let offset = owner.collectionView.contentOffset.y
                         if offset < 0 {
                             owner.collectionView.scrollToTop()
 
