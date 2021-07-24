@@ -45,9 +45,7 @@ open class SubcontentViewController: UIViewController {
         
         navigationController?.navigationBar.isHidden = true
 
-        collectionView.layer.cornerRadius = 26
-        collectionView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-
+        setupCollectionView()
         setupMenu()
         setupBindings()
     }
@@ -67,6 +65,12 @@ open class SubcontentViewController: UIViewController {
 }
 
 private extension SubcontentViewController {
+
+    func setupCollectionView() {
+        collectionView.alwaysBounceVertical = true
+        collectionView.layer.cornerRadius = 26
+        collectionView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+    }
 
     func setupMenu() {
         topView.translatesAutoresizingMaskIntoConstraints = false
@@ -98,6 +102,7 @@ private extension SubcontentViewController {
                             if let state = try? owner.topViewContent.topReachState.value(),
                                state != $0 {
                                 owner.topViewContent.topReachState.onNext($0)
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             }
                         }
 
@@ -107,17 +112,20 @@ private extension SubcontentViewController {
 
                             if owner.isTopReached {
                                 updateState(.full)
+
                             } else {
                                 owner.isTopReached = true
                             }
                         } else if offset > 0 {
-                            if owner.isTopReached {
+                            if owner.isTopReached,
+                               let state = try? owner.topViewContent.topReachState.value(),
+                               state == .full {
                                 owner.collectionView.scrollToTop()
                                 owner.collectionView.stopScrolling()
-                                owner.isTopReached = false
                                 updateState(.compact)
                             }
 
+                            owner.isTopReached = false
                         }
                     }
                 )

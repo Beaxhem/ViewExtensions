@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "ViewExtensions",
     platforms: [
-        .iOS(.v12)
+        .iOS(.v13)
     ],
     products: [
         .library(
