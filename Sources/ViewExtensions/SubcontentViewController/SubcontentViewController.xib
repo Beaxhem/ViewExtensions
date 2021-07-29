@@ -12,6 +12,7 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SubcontentViewController" customModule="Dyet" customModuleProvider="target">
             <connections>
                 <outlet property="collectionView" destination="6Lv-rL-a1e" id="gKq-P8-omD"/>
+                <outlet property="pageContainer" destination="emR-vc-Dw7" id="eep-3f-rZS"/>
                 <outlet property="topView" destination="Rw0-0w-0LJ" id="koJ-8t-ccU"/>
                 <outlet property="topViewHeightConstraint" destination="uhf-hV-p7n" id="o6t-XX-RYj"/>
                 <outlet property="view" destination="iN0-l3-epB" id="mQO-Zb-D6m"/>
@@ -22,36 +23,48 @@
             <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="kwF-VT-nOn">
-                    <rect key="frame" x="0.0" y="44" width="414" height="852"/>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="emR-vc-Dw7">
+                    <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                     <subviews>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rw0-0w-0LJ" userLabel="Menu">
-                            <rect key="frame" x="0.0" y="0.0" width="414" height="250"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="250" id="uhf-hV-p7n"/>
-                            </constraints>
-                        </view>
-                        <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="6Lv-rL-a1e">
-                            <rect key="frame" x="0.0" y="250" width="414" height="602"/>
-                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                            <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="eK1-Ez-vqn">
-                                <size key="itemSize" width="128" height="128"/>
-                                <size key="headerReferenceSize" width="0.0" height="0.0"/>
-                                <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                                <inset key="sectionInset" minX="0.0" minY="30" maxX="0.0" maxY="0.0"/>
-                            </collectionViewFlowLayout>
-                        </collectionView>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="kwF-VT-nOn">
+                            <rect key="frame" x="0.0" y="44" width="414" height="852"/>
+                            <subviews>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rw0-0w-0LJ" userLabel="Menu">
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="250"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="250" id="uhf-hV-p7n"/>
+                                    </constraints>
+                                </view>
+                                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="6Lv-rL-a1e">
+                                    <rect key="frame" x="0.0" y="250" width="414" height="602"/>
+                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                    <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="eK1-Ez-vqn">
+                                        <size key="itemSize" width="128" height="128"/>
+                                        <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                        <inset key="sectionInset" minX="0.0" minY="30" maxX="0.0" maxY="0.0"/>
+                                    </collectionViewFlowLayout>
+                                </collectionView>
+                            </subviews>
+                        </stackView>
                     </subviews>
-                </stackView>
+                    <viewLayoutGuide key="safeArea" id="OXI-pT-xYy"/>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstAttribute="bottom" secondItem="kwF-VT-nOn" secondAttribute="bottom" id="AGe-k6-EuE"/>
+                        <constraint firstItem="kwF-VT-nOn" firstAttribute="leading" secondItem="emR-vc-Dw7" secondAttribute="leading" id="QDK-O4-hbk"/>
+                        <constraint firstAttribute="trailing" secondItem="kwF-VT-nOn" secondAttribute="trailing" id="SYP-7a-XXK"/>
+                        <constraint firstItem="kwF-VT-nOn" firstAttribute="top" secondItem="OXI-pT-xYy" secondAttribute="top" id="wn5-jg-8LV"/>
+                    </constraints>
+                </view>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
-                <constraint firstItem="Rw0-0w-0LJ" firstAttribute="height" relation="lessThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="height" id="25L-Pe-HuX"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="kwF-VT-nOn" secondAttribute="trailing" id="SDi-nY-hco"/>
-                <constraint firstAttribute="bottom" secondItem="kwF-VT-nOn" secondAttribute="bottom" id="VPI-OJ-Taz"/>
-                <constraint firstItem="kwF-VT-nOn" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="Y3V-QP-hDe"/>
-                <constraint firstItem="kwF-VT-nOn" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="ZyP-Y4-2w7"/>
+                <constraint firstItem="emR-vc-Dw7" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="Fpc-lO-4v5"/>
+                <constraint firstAttribute="bottom" secondItem="emR-vc-Dw7" secondAttribute="bottom" id="bwk-5e-U6g"/>
+                <constraint firstItem="emR-vc-Dw7" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="hvN-gJ-Tl4"/>
+                <constraint firstItem="emR-vc-Dw7" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="uHW-ON-Esg"/>
             </constraints>
             <point key="canvasLocation" x="-4.3478260869565224" y="84.375"/>
         </view>

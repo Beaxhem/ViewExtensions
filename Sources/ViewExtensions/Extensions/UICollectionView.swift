@@ -11,6 +11,10 @@ public extension UICollectionView {
 
     typealias ViewModelContainingCell = UICollectionViewCell & ViewModelContainer
 
+    func registerCell<T: UICollectionViewCell>(_ cell: T.Type) {
+        register(cell, forCellWithReuseIdentifier: cell.reuseIdentifier)
+    }
+
     func register<T: UICollectionViewCell>(_ cell: T.Type, bundle: Bundle? = nil) {
         register(
             UINib(nibName: cell.reuseIdentifier, bundle: bundle ?? .module),

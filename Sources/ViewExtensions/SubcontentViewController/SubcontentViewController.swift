@@ -22,6 +22,7 @@ open class SubcontentViewController: UIViewController {
 
     private static let animationDuration: TimeInterval = 0.2
 
+    @IBOutlet public weak var pageContainer: UIView!
     @IBOutlet public weak var collectionView: UICollectionView!
     @IBOutlet public weak var topView: UIView!
     @IBOutlet weak var topViewHeightConstraint: NSLayoutConstraint!
@@ -31,6 +32,11 @@ open class SubcontentViewController: UIViewController {
 
     public var topViewContent: TopReachObserving!
     public var disposeBag: DisposeBag?
+    public var backgroundColor: UIColor? {
+        didSet {
+            pageContainer.backgroundColor = backgroundColor
+        }
+    }
 
     public init() {
         super.init(nibName: SubcontentViewController.reuseIdentifier, bundle: .module)
@@ -42,7 +48,8 @@ open class SubcontentViewController: UIViewController {
 
     open override func viewDidLoad() {
         super.viewDidLoad()
-        
+
+        view.backgroundColor = .systemBackground
         navigationController?.navigationBar.isHidden = true
 
         setupCollectionView()
