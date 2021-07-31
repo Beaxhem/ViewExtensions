@@ -37,6 +37,9 @@ open class SubcontentViewController: UIViewController {
             pageContainer.backgroundColor = backgroundColor
         }
     }
+    open var isScrollObserving: Bool {
+        false
+    }
 
     public init() {
         super.init(nibName: SubcontentViewController.reuseIdentifier, bundle: .module)
@@ -104,6 +107,9 @@ private extension SubcontentViewController {
                 .subscribe(
                     with: self,
                     onNext: { owner, _ in
+                        guard owner.isScrollObserving else {
+                            return
+                        }
 
                         let updateState: (TopViewState) -> () = {
                             if let state = try? owner.topViewContent.topReachState.value(),
