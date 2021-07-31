@@ -10,6 +10,7 @@ import UIKit
 public extension UICollectionView {
 
     typealias ViewModelContainingCell = UICollectionViewCell & ViewModelContainer
+    typealias ViewModelContainerController = UIViewController & ViewModelContainer
 
     func registerCell<T: UICollectionViewCell>(_ cell: T.Type) {
         register(cell, forCellWithReuseIdentifier: cell.reuseIdentifier)
@@ -30,5 +31,17 @@ public extension UICollectionView {
         var cell = dequeueCell(T.self, for: indexPath)
         cell.viewModel = viewModel
         return cell
+    }
+
+    func dequeueContainerCell<T: UIViewController>(with vc: T, for indexPath: IndexPath) -> ContainerCell {
+        let cell = dequeueCell(ContainerCell.self, for: indexPath)
+        cell.add(vc)
+        return cell
+    }
+
+    func dequeueContainerCell<T: ViewModelContainerController>(with vc: T, viewModel: T.VM, for indexPath: IndexPath) -> ContainerCell {
+        var mutableVc = vc
+        mutableVc.viewModel = viewModel
+        return dequeueContainerCell(with: mutableVc, for: indexPath)
     }
 }
