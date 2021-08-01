@@ -58,6 +58,9 @@ open class SubcontentViewController: UIViewController {
         setupCollectionView()
         setupMenu()
         setupBindings()
+
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIWindow.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide), name: UIWindow.keyboardWillHideNotification, object: nil)
     }
 
     open override func preferredContentSizeDidChange(forChildContentContainer container: UIContentContainer) {
@@ -99,6 +102,11 @@ private extension SubcontentViewController {
     func setupBindings() {
 
         disposeBag = DisposeBag {
+
+            collectionView.rx.observe(\.contentInset)
+                .subscribe(onNext: {
+                    print("TESTT", $0)
+                })
 
             collectionView
                 .rx
@@ -148,3 +156,16 @@ private extension SubcontentViewController {
 
 }
 
+extension SubcontentViewController {
+
+    @objc func keyboardWillShow(_ notification: NSNotification) {
+        if let keyboardHeight = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            collectionView.contentInset.bottom = view.frame.height - keyboardHeight.origin.y
+        }
+    }
+
+    @objc func keyboardWillHide(_ notification: NSNotification) {
+        collectionView.contentInset.bottom = 0
+    }
+
+}
