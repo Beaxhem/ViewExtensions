@@ -53,7 +53,6 @@ open class SubcontentViewController: UIViewController {
         super.viewDidLoad()
 
         view.backgroundColor = .systemBackground
-        navigationController?.navigationBar.isHidden = true
 
         setupCollectionView()
         setupMenu()
@@ -102,11 +101,6 @@ private extension SubcontentViewController {
     func setupBindings() {
 
         disposeBag = DisposeBag {
-
-            collectionView.rx.observe(\.contentInset)
-                .subscribe(onNext: {
-                    print("TESTT", $0)
-                })
 
             collectionView
                 .rx
