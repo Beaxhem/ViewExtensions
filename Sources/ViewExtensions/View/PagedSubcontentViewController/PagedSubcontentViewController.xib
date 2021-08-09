@@ -11,7 +11,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PagedSubcontentViewController" customModule="ViewExtensions">
             <connections>
-                <outlet property="mainContentContainerView" destination="FNZ-9Y-g2c" id="O47-9f-bhm"/>
+                <outlet property="collectionView" destination="up5-G1-oEK" id="Xpu-Jq-BZz"/>
                 <outlet property="topContentContainerView" destination="KHu-ah-Pfv" id="ePa-q6-eEY"/>
                 <outlet property="topContentHeightConstraint" destination="Gxt-4J-n8c" id="FyA-XA-f5S"/>
                 <outlet property="view" destination="iN0-l3-epB" id="6WR-x6-2SI"/>
@@ -22,40 +22,34 @@
             <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4kT-Mh-ZVz">
+                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="Ymp-6c-no3">
                     <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                     <subviews>
-                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="Ymp-6c-no3">
-                            <rect key="frame" x="0.0" y="44" width="414" height="852"/>
-                            <subviews>
-                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KHu-ah-Pfv">
-                                    <rect key="frame" x="0.0" y="0.0" width="414" height="250"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="250" id="Gxt-4J-n8c"/>
-                                    </constraints>
-                                </view>
-                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FNZ-9Y-g2c">
-                                    <rect key="frame" x="0.0" y="250" width="414" height="602"/>
-                                </view>
-                            </subviews>
-                        </stackView>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KHu-ah-Pfv">
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="250"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="250" id="Gxt-4J-n8c"/>
+                            </constraints>
+                        </view>
+                        <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceHorizontal="YES" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="up5-G1-oEK">
+                            <rect key="frame" x="0.0" y="250" width="414" height="646"/>
+                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="r8H-hN-xAY">
+                                <size key="itemSize" width="128" height="128"/>
+                                <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                            </collectionViewFlowLayout>
+                        </collectionView>
                     </subviews>
-                    <viewLayoutGuide key="safeArea" id="Vac-uo-Q3C"/>
-                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    <constraints>
-                        <constraint firstItem="Ymp-6c-no3" firstAttribute="leading" secondItem="4kT-Mh-ZVz" secondAttribute="leading" id="c9h-5L-AiZ"/>
-                        <constraint firstAttribute="trailing" secondItem="Ymp-6c-no3" secondAttribute="trailing" id="dLr-ET-FKj"/>
-                        <constraint firstItem="Ymp-6c-no3" firstAttribute="top" secondItem="Vac-uo-Q3C" secondAttribute="top" id="mbE-P8-lAB"/>
-                        <constraint firstAttribute="bottom" secondItem="Ymp-6c-no3" secondAttribute="bottom" id="mnk-gX-FhD"/>
-                    </constraints>
-                </view>
+                </stackView>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <constraints>
-                <constraint firstItem="4kT-Mh-ZVz" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="HK3-Cd-6qC"/>
-                <constraint firstItem="4kT-Mh-ZVz" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="ObZ-Mc-7HN"/>
-                <constraint firstAttribute="bottom" secondItem="4kT-Mh-ZVz" secondAttribute="bottom" id="ScD-go-EyT"/>
-                <constraint firstItem="4kT-Mh-ZVz" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="qjS-4t-ccM"/>
+                <constraint firstItem="Ymp-6c-no3" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="IUe-pQ-sjM"/>
+                <constraint firstAttribute="bottom" secondItem="Ymp-6c-no3" secondAttribute="bottom" id="Oci-kD-6A9"/>
+                <constraint firstItem="Ymp-6c-no3" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="Oxt-Vh-AQa"/>
+                <constraint firstItem="Ymp-6c-no3" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="hX7-Xg-dGn"/>
             </constraints>
             <point key="canvasLocation" x="139" y="76"/>
         </view>
