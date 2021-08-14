@@ -91,11 +91,11 @@ private extension SubcontentViewController {
         container.move(to: self, viewPath: \.topView)
         container.view.fit(into: topView)
 
-        topViewContent = self.getTopView()
-        self.topViewContent.move(to: self.container)
-        self.topViewContent.view.fit(into: self.container.view)
+        topViewContent = getTopView()
+        topViewContent.move(to: container)
+        topViewContent.view.fit(into: container.view)
 
-        self.view.forceLayout()
+        view.forceLayout()
     }
 
     func setupBindings() {
