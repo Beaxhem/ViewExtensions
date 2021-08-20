@@ -11,7 +11,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PagedSubcontentViewController" customModule="ViewExtensions">
             <connections>
-                <outlet property="pagedView" destination="sEE-6i-aah" id="Qz9-tH-zPK"/>
+                <outlet property="mainContentContainerView" destination="sEE-6i-aah" id="7jq-jC-XCT"/>
                 <outlet property="topContentContainerView" destination="KHu-ah-Pfv" id="ePa-q6-eEY"/>
                 <outlet property="topContentHeightConstraint" destination="pAf-SA-XlE" id="GsY-OZ-AA7"/>
                 <outlet property="view" destination="iN0-l3-epB" id="6WR-x6-2SI"/>
@@ -31,7 +31,7 @@
                                 <constraint firstAttribute="height" constant="250" id="pAf-SA-XlE"/>
                             </constraints>
                         </view>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sEE-6i-aah" customClass="HorizontalPagedView" customModule="ViewExtensions">
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sEE-6i-aah">
                             <rect key="frame" x="0.0" y="250" width="414" height="646"/>
                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         </view>
