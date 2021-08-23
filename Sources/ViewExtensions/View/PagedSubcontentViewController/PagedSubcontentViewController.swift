@@ -61,7 +61,7 @@ open class PagedSubcontentViewController: UIViewController {
     open override func viewDidLoad() {
         super.viewDidLoad()
         _setupView()
-        _setupBindings()
+        setupAnimation()
     }
 
     open func getTopContent() -> UIViewController {
@@ -103,14 +103,14 @@ private extension PagedSubcontentViewController {
 
 private extension PagedSubcontentViewController {
 
-    @objc func test(gesture: UIPanGestureRecognizer) {
+    @objc func handleGesture(gesture: UIPanGestureRecognizer) {
         guard gesture.state == .began else { return }
         animationController.touchBegan.accept(())
     }
 
 
-    func _setupBindings() {
-        scrollView.panGestureRecognizer.addTarget(self, action: #selector(test))
+    func setupAnimation() {
+        scrollView.panGestureRecognizer.addTarget(self, action: #selector(handleGesture))
 
         animationController.animation = { [weak self] controller in
             let backgroundColor: UIColor = controller.view.backgroundColor ?? .systemBackground
