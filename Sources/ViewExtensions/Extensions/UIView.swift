@@ -9,9 +9,9 @@ import UIKit
 
 public extension UIView {
 
-    func fit(into view: UIView) {
+    // MARK: -Layout
+    func fit(_ view: UIView) {
         view.translatesAutoresizingMaskIntoConstraints = false
-        translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -25,5 +25,15 @@ public extension UIView {
         setNeedsLayout()
         layoutIfNeeded()
     }
+
+    // MARK: -Layers
+
+   func roundCorners(corners: UIRectCorner, radius: CGFloat) {
+        let path = UIBezierPath(roundedRect: bounds, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
+        let mask = CAShapeLayer()
+        mask.path = path.cgPath
+        layer.mask = mask
+    }
+
 
 }

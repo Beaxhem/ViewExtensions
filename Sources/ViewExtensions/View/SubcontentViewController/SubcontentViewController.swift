@@ -89,11 +89,11 @@ private extension SubcontentViewController {
 
         container = SelfSizingViewController()
         container.move(to: self, viewPath: \.topView)
-        container.view.fit(into: topView)
+        container.view.fit(topView)
 
         topViewContent = getTopView()
         topViewContent.move(to: container)
-        topViewContent.view.fit(into: container.view)
+        topViewContent.view.fit(container.view)
 
         view.forceLayout()
     }

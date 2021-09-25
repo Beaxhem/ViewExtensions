@@ -23,21 +23,20 @@ open class PagedSubcontentViewController: UIViewController {
         return vc
     }()
 
-    private lazy var animationController = PageViewAnimationController(pageViewController: pageViewController, scrollView: scrollView)
-
     private var _disposeBag: DisposeBag?
     private var topContentContainer: UIViewController!
 
-    private var scrollView: UIScrollView {
-        pageViewController.view.subviews.first as! UIScrollView
-    }
-
+    private lazy var animationController = PageViewAnimationController(pageViewController: pageViewController, scrollView: scrollView)
     private lazy var dataSource = RxCollectionViewSectionedAnimatedDataSource<PagedSection>(
         animationConfiguration: .init(insertAnimation: .none, reloadAnimation: .none, deleteAnimation: .none),
         configureCell: { _, collectionView, indexPath, item in
             collectionView.dequeueContainerCell(with: item, for: indexPath)
         }
     )
+
+    private var scrollView: UIScrollView {
+        pageViewController.view.subviews.first as! UIScrollView
+    }
 
     public init() {
         super.init(nibName: PagedSubcontentViewController.reuseIdentifier, bundle: .module)
@@ -65,7 +64,7 @@ open class PagedSubcontentViewController: UIViewController {
     }
 
     open func getTopContent() -> UIViewController {
-        fatalError()
+        UIViewController()
     }
 
 }
@@ -82,11 +81,11 @@ private extension PagedSubcontentViewController {
     func setupTopContent() {
         topContentContainer = SelfSizingViewController()
         topContentContainer.move(to: self, viewPath: \.topContentContainerView)
-        topContentContainer.view.fit(into: topContentContainerView)
+        topContentContainer.view.fit(topContentContainerView)
 
         topContent = getTopContent()
         topContent.move(to: topContentContainer)
-        topContent.view.fit(into: topContentContainer.view)
+        topContent.view.fit(topContentContainer.view)
     }
 
     func setupMainContent() {
@@ -96,7 +95,7 @@ private extension PagedSubcontentViewController {
 
         pageViewController.move(to: self)
         mainContentContainerView.addSubview(pageViewController.view)
-        pageViewController.view.fit(into: mainContentContainerView)
+        pageViewController.view.fit(mainContentContainerView)
     }
 
 }
