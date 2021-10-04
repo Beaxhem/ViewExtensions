@@ -53,7 +53,6 @@ open class SubcontentViewController: UIViewController {
         super.viewDidLoad()
 
         view.backgroundColor = .systemBackground
-        navigationController?.navigationBar.isHidden = true
 
         setupCollectionView()
         setupMenu()
@@ -90,23 +89,18 @@ private extension SubcontentViewController {
 
         container = SelfSizingViewController()
         container.move(to: self, viewPath: \.topView)
-        container.view.fit(into: topView)
+        container.view.fit(topView)
 
-        topViewContent = self.getTopView()
-        self.topViewContent.move(to: self.container)
-        self.topViewContent.view.fit(into: self.container.view)
+        topViewContent = getTopView()
+        topViewContent.move(to: container)
+        topViewContent.view.fit(container.view)
 
-        self.view.forceLayout()
+        view.forceLayout()
     }
 
     func setupBindings() {
 
         disposeBag = DisposeBag {
-
-            collectionView.rx.observe(\.contentInset)
-                .subscribe(onNext: {
-                    print("TESTT", $0)
-                })
 
             collectionView
                 .rx

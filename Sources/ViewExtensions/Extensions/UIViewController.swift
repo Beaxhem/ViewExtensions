@@ -9,10 +9,23 @@ import UIKit
 
 public extension UIViewController {
 
+    var topSafeArea: CGFloat {
+        UIApplication.shared.windows.first!.safeAreaInsets.top
+    }
+
+    var bottomSafeArea: CGFloat {
+        UIApplication.shared.windows.first!.safeAreaInsets.bottom
+    }
+
     func move<T: UIViewController>(to parent: T, viewPath: KeyPath<T, UIView> = \.view) {
         parent.addChild(self)
         parent[keyPath: viewPath].addSubview(self.view)
         didMove(toParent: parent)
+    }
+
+    func moveAndFit<T: UIViewController>(to parent: T, viewPath: KeyPath<T, UIView> = \.view) {
+        move(to: parent, viewPath: viewPath)
+        parent[keyPath: viewPath].fit(view)
     }
 
     static func instantiate() -> Self {
