@@ -12,10 +12,11 @@ import RxCocoa
 public class ModalViewController: UIViewController {
 
     public static func present(in parent: UIViewController,
-                               controller: UIViewController,
+                               controller: ModalPresented,
                                animationDuration: TimeInterval = 0.5) -> ModalViewController {
         let modalViewController = ModalViewController()
 
+        controller.dragGestureRecognizer = modalViewController.dragGestureRecognizer
         modalViewController.animationDuration = animationDuration
         modalViewController.rootViewController = controller
         modalViewController.moveAndFit(to: parent)
@@ -37,12 +38,24 @@ public class ModalViewController: UIViewController {
         return contentView
     }()
 
+    private lazy var dragIndicator: UIView = {
+        let dragIndicator = UIView()
+        dragIndicator.backgroundColor = .white
+        dragIndicator.layer.cornerRadius = 4
+        dragIndicator.translatesAutoresizingMaskIntoConstraints = false
+        return dragIndicator
+    }()
+
     private lazy var dismissTapGestureRecognizer: UITapGestureRecognizer = {
         UITapGestureRecognizer(target: self, action: #selector(dismissModal))
     }()
 
     private lazy var dragGestureRecognizer: UIPanGestureRecognizer = {
         UIPanGestureRecognizer(target: self, action: #selector(onDrag))
+    }()
+
+    private lazy var propertyAnimator: UIViewPropertyAnimator = {
+        UIViewPropertyAnimator(duration: 0.3, curve: .easeOut)
     }()
 
     private var animationDuration: TimeInterval = 0.3
@@ -76,11 +89,12 @@ public class ModalViewController: UIViewController {
 extension ModalViewController {
 
     public func showModal() {
+        navigationController?.navigationBar.toggle()
         dimmingView.layer.opacity = 0
         yConstraint?.constant = view.frame.height
         view.layoutIfNeeded()
 
-        UIView.animate(withDuration: animationDuration) { [weak self] in
+        UIView.springAnimation(duration: animationDuration) { [weak self] in
             guard let self = self else { return }
             self.yConstraint.constant = self.initialTopOffset
             self.dimmingView.layer.opacity = 1
@@ -89,11 +103,8 @@ extension ModalViewController {
     }
 
     @objc public func dismissModal() {
-        UIView.animate(withDuration: animationDuration,
-                       delay: 0,
-                       usingSpringWithDamping: 0.8,
-                       initialSpringVelocity: 0.5,
-                       options: [.curveEaseOut]) { [weak self] in
+        navigationController?.navigationBar.toggle()
+        UIView.animate(withDuration: animationDuration) { [weak self] in
             guard let self = self else { return }
             self.yConstraint.constant = self.view.frame.height
             self.dimmingView.layer.opacity = 0
@@ -109,16 +120,12 @@ extension ModalViewController {
                 initialTopOffset = yConstraint.constant
             case .changed:
                 let translationY = sender.translation(in: view).y
-                let bottomSafeArea = UIApplication.shared.windows.first!.safeAreaInsets.bottom
-
-                yConstraint.constant = max(initialTopOffset + translationY,
-                                           bottomSafeArea + Constants.additionalTopSpace)
+                yConstraint.constant = max(initialTopOffset + translationY, topSafeArea + Constants.additionalTopSpace)
             case .ended:
                 let translationY = sender.translation(in: view).y
                 let velocityY = sender.velocity(in: view).y
                 if translationY > rootViewController.view.frame.height / 2
-                   || velocityY > 500 {
-
+                    || velocityY > Constants.dismissVelocity {
                     dismissModal()
                 } else {
                     yConstraint.constant = initialTopOffset
@@ -140,17 +147,39 @@ private extension ModalViewController {
         view.fit(dimmingView)
         view.addSubview(contentView)
         rootViewController?.move(to: self, viewPath: \.contentView)
+        view.addSubview(dragIndicator)
+
+
 
         setupConstraints()
     }
 
     func setupConstraints() {
-        let preferredHeight = rootViewController.view.systemLayoutSizeFitting(view.frame.size, withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel).height
-        let bottomSafeArea = UIApplication.shared.windows.first!.safeAreaInsets.bottom
-        let height = preferredHeight + bottomSafeArea
+        var preferredHeight: CGFloat
+        switch rootViewController {
+            case is ModalPresentedCollectionViewController:
+                guard let rootViewController = rootViewController as? ModalPresentedCollectionViewController else {
+                    return
+                }
 
-        let topOffset = max(view.frame.height - height,
-                            bottomSafeArea + Constants.additionalTopSpace)
+                rootViewController._collectionView.layoutSubviews()
+                let contentSizeHeight = rootViewController._collectionView.collectionViewLayout.collectionViewContentSize.height
+
+                rootViewController.view.forceLayout()
+                let containerHeight = rootViewController.view.frame.height
+
+                preferredHeight = containerHeight + contentSizeHeight + bottomSafeArea
+            default:
+                preferredHeight = rootViewController.view.systemLayoutSizeFitting(
+                    view.frame.size,
+                    withHorizontalFittingPriority: .required,
+                    verticalFittingPriority: .fittingSizeLevel
+                ).height + bottomSafeArea
+        }   
+
+        let height = min(view.frame.height - topSafeArea - Constants.additionalTopSpace, preferredHeight)
+
+        let topOffset = view.frame.height - height
         let topConstraint = contentView.topAnchor.constraint(equalTo: view.topAnchor, constant: topOffset)
 
         initialTopOffset = topOffset
@@ -166,6 +195,13 @@ private extension ModalViewController {
             rootViewController.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             rootViewController.view.heightAnchor.constraint(equalToConstant: height)
         ])
+
+        NSLayoutConstraint.activate([
+            dragIndicator.bottomAnchor.constraint(equalTo: contentView.topAnchor, constant: -5),
+            dragIndicator.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            dragIndicator.widthAnchor.constraint(equalToConstant: 50),
+            dragIndicator.heightAnchor.constraint(equalToConstant: 7)
+        ])
     }
 
     func setupRootView() {
@@ -180,6 +216,7 @@ private extension ModalViewController {
     enum Constants {
         static let cornerRadius: CGFloat = 30
         static let additionalTopSpace: CGFloat = 30
+        static let dismissVelocity: CGFloat = 500
     }
 
 }
