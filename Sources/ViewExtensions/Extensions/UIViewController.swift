@@ -9,9 +9,13 @@ import UIKit
 
 public extension UIViewController {
 
+    // MARK: - Static functions
+
     static func instantiate() -> Self {
         return Self.init(nibName: Self.reuseIdentifier, bundle: nil)
     }
+
+    // MARK: - Properties
 
     var topSafeArea: CGFloat {
         UIApplication.shared.windows.first!.safeAreaInsets.top
@@ -20,6 +24,10 @@ public extension UIViewController {
     var bottomSafeArea: CGFloat {
         UIApplication.shared.windows.first!.safeAreaInsets.bottom
     }
+
+    // MARK: - Methods
+
+    // MARK: Layout
 
     func move<T: UIViewController>(to parent: T, viewPath: KeyPath<T, UIView> = \.view) {
         parent.addChild(self)

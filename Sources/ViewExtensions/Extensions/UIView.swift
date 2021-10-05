@@ -28,7 +28,8 @@ public extension UIView {
         }
     }
 
-    // MARK: -Layout
+    // MARK: - Layout
+
     func fit(_ view: UIView) {
         view.translatesAutoresizingMaskIntoConstraints = false
         
@@ -45,7 +46,7 @@ public extension UIView {
         layoutIfNeeded()
     }
 
-    // MARK: -Layers
+    // MARK: - Layers
 
    func roundCorners(corners: CACornerMask, radius: CGFloat) {
        layer.cornerRadius = radius

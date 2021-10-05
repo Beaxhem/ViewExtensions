@@ -114,6 +114,7 @@ extension ModalViewController {
         } completion: { [weak self] tset in
             self?.rootViewController.remove()
             self?.view.removeFromSuperview()
+            self?.rootViewController = nil
         }
     }
 
