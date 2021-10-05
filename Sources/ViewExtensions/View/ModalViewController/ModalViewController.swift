@@ -37,7 +37,7 @@ public class ModalViewController: UIViewController {
         return contentView
     }()
 
-    public static let defaultContentInsets: UIEdgeInsets = .init(top: 20, left: 0, bottom: 100, right: 0)
+    public static let defaultContentInsets: UIEdgeInsets = .init(top: 20, left: 0, bottom: 0, right: 0)
 
     private lazy var dimmingView: UIView = {
         let view = UIView()
@@ -210,9 +210,6 @@ private extension ModalViewController {
             dragIndicator.widthAnchor.constraint(equalToConstant: Constants.DragIndicator.width),
             dragIndicator.heightAnchor.constraint(equalToConstant: Constants.DragIndicator.height)
         ])
-    }
-
-    func setupRootView() {
     }
 
 }
