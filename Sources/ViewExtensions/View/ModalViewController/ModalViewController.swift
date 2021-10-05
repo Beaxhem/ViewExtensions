@@ -13,10 +13,12 @@ public class ModalViewController: UIViewController {
 
     public static func present(in parent: UIViewController,
                                controller: ModalPresented,
+                               contentView: UIView = defaultContentView,
                                animationDuration: TimeInterval = 0.5) -> ModalViewController {
         let modalViewController = ModalViewController()
 
         controller.dragGestureRecognizer = modalViewController.dragGestureRecognizer
+        modalViewController.contentView = contentView
         modalViewController.animationDuration = animationDuration
         modalViewController.rootViewController = controller
         modalViewController.moveAndFit(to: parent)
@@ -24,18 +26,19 @@ public class ModalViewController: UIViewController {
         return modalViewController
     }
 
+    public static var defaultContentView: UIView = {
+        let contentView = UIView()
+        contentView.backgroundColor = .white
+        contentView.clipsToBounds = true
+        contentView.roundCorners(corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner],
+                                 radius: Constants.cornerRadius)
+        return contentView
+    }()
+
     private lazy var dimmingView: UIView = {
         let view = UIView()
         view.backgroundColor = .black.withAlphaComponent(0.2)
         return view
-    }()
-
-    private lazy var contentView: UIView = {
-        let contentView = UIView()
-        contentView.backgroundColor = .white
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.clipsToBounds = true
-        return contentView
     }()
 
     private lazy var dragIndicator: UIView = {
@@ -58,6 +61,8 @@ public class ModalViewController: UIViewController {
         UIViewPropertyAnimator(duration: 0.3, curve: .easeOut)
     }()
 
+    private var contentView: UIView!
+
     private var animationDuration: TimeInterval = 0.3
 
     private var yConstraint: NSLayoutConstraint!
@@ -68,8 +73,8 @@ public class ModalViewController: UIViewController {
 
     override public func viewDidLoad() {
         super.viewDidLoad()
+        contentView.translatesAutoresizingMaskIntoConstraints = false
         setupView()
-
         dimmingView.addGestureRecognizer(dismissTapGestureRecognizer)
         rootViewController.view.addGestureRecognizer(dragGestureRecognizer)
     }
@@ -110,7 +115,9 @@ extension ModalViewController {
             self.dimmingView.layer.opacity = 0
             self.view.layoutIfNeeded()
         } completion: { [weak self] tset in
+            self?.rootViewController.view.removeFromSuperview()
             self?.view.removeFromSuperview()
+            self?.rootViewController.removeFromParent()
         }
     }
 
@@ -148,8 +155,6 @@ private extension ModalViewController {
         view.addSubview(contentView)
         rootViewController?.move(to: self, viewPath: \.contentView)
         view.addSubview(dragIndicator)
-
-
 
         setupConstraints()
     }
@@ -205,8 +210,6 @@ private extension ModalViewController {
     }
 
     func setupRootView() {
-        contentView.roundCorners(corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner],
-                                 radius: Constants.cornerRadius)
     }
 
 }
