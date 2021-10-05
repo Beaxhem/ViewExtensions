@@ -176,13 +176,13 @@ private extension ModalViewController {
                 rootViewController.view.forceLayout()
                 let containerHeight = rootViewController.view.frame.height
 
-                preferredHeight = containerHeight + contentSizeHeight + bottomSafeArea + contentInsets.bottom
+                preferredHeight = containerHeight + contentSizeHeight + additionalBottomSpace
             default:
                 preferredHeight = rootViewController.view.systemLayoutSizeFitting(
                     view.frame.size,
                     withHorizontalFittingPriority: .required,
                     verticalFittingPriority: .fittingSizeLevel
-                ).height + bottomSafeArea + contentInsets.bottom
+                ).height + additionalBottomSpace
         }   
 
         let height = min(view.frame.height - topSafeArea - Constants.additionalTopSpace, preferredHeight)
