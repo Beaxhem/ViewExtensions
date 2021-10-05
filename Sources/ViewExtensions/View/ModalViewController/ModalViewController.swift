@@ -14,11 +14,13 @@ public class ModalViewController: UIViewController {
     public static func present(in parent: UIViewController,
                                controller: ModalPresented,
                                contentView: UIView = defaultContentView,
+                               contentInsets: UIEdgeInsets = defaultContentInsets,
                                animationDuration: TimeInterval = 0.5) -> ModalViewController {
         let modalViewController = ModalViewController()
 
         controller.dragGestureRecognizer = modalViewController.dragGestureRecognizer
         modalViewController.contentView = contentView
+        modalViewController.contentInsets = contentInsets
         modalViewController.animationDuration = animationDuration
         modalViewController.rootViewController = controller
         modalViewController.moveAndFit(to: parent)
@@ -34,6 +36,8 @@ public class ModalViewController: UIViewController {
                                  radius: Constants.cornerRadius)
         return contentView
     }()
+
+    public static let defaultContentInsets: UIEdgeInsets = .init(top: 20, left: 0, bottom: 0, right: 0)
 
     private lazy var dimmingView: UIView = {
         let view = UIView()
@@ -62,6 +66,8 @@ public class ModalViewController: UIViewController {
     }()
 
     private var contentView: UIView!
+
+    private var contentInsets: UIEdgeInsets!
 
     private var animationDuration: TimeInterval = 0.3
 
@@ -155,6 +161,8 @@ private extension ModalViewController {
     }
 
     func setupConstraints() {
+        let additionalBottomSpace = bottomSafeArea + contentInsets.bottom
+
         var preferredHeight: CGFloat
         switch rootViewController {
             case is ModalPresentedCollectionViewController:
@@ -168,18 +176,18 @@ private extension ModalViewController {
                 rootViewController.view.forceLayout()
                 let containerHeight = rootViewController.view.frame.height
 
-                preferredHeight = containerHeight + contentSizeHeight + bottomSafeArea
+                preferredHeight = containerHeight + contentSizeHeight + additionalBottomSpace
             default:
                 preferredHeight = rootViewController.view.systemLayoutSizeFitting(
                     view.frame.size,
                     withHorizontalFittingPriority: .required,
                     verticalFittingPriority: .fittingSizeLevel
-                ).height + bottomSafeArea
+                ).height + additionalBottomSpace
         }   
 
         let height = min(view.frame.height - topSafeArea - Constants.additionalTopSpace, preferredHeight)
 
-        let topOffset = view.frame.height - height
+        let topOffset = view.frame.height - height - contentInsets.top
         let topConstraint = contentView.topAnchor.constraint(equalTo: view.topAnchor, constant: topOffset)
 
         initialTopOffset = topOffset
@@ -190,17 +198,17 @@ private extension ModalViewController {
             contentView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            rootViewController.view.topAnchor.constraint(equalTo: contentView.topAnchor),
-            rootViewController.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            rootViewController.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            rootViewController.view.topAnchor.constraint(equalTo: contentView.topAnchor, constant: contentInsets.top),
+            rootViewController.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: contentInsets.left),
+            rootViewController.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: contentInsets.right),
             rootViewController.view.heightAnchor.constraint(equalToConstant: height)
         ])
 
         NSLayoutConstraint.activate([
             dragIndicator.bottomAnchor.constraint(equalTo: contentView.topAnchor, constant: -5),
             dragIndicator.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            dragIndicator.widthAnchor.constraint(equalToConstant: 50),
-            dragIndicator.heightAnchor.constraint(equalToConstant: 7)
+            dragIndicator.widthAnchor.constraint(equalToConstant: Constants.DragIndicator.width),
+            dragIndicator.heightAnchor.constraint(equalToConstant: Constants.DragIndicator.height)
         ])
     }
 
@@ -215,6 +223,11 @@ private extension ModalViewController {
         static let cornerRadius: CGFloat = 30
         static let additionalTopSpace: CGFloat = 30
         static let dismissVelocity: CGFloat = 500
+
+        enum DragIndicator {
+            static let width: CGFloat = 50
+            static let height: CGFloat = 7
+        }
     }
 
 }
