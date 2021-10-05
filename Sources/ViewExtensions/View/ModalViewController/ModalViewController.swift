@@ -37,7 +37,7 @@ public class ModalViewController: UIViewController {
         return contentView
     }()
 
-    public static let defaultContentInsets: UIEdgeInsets = .init(top: 20, left: 0, bottom: 0, right: 0)
+    public static let defaultContentInsets: UIEdgeInsets = .init(top: 20, left: 0, bottom: 100, right: 0)
 
     private lazy var dimmingView: UIView = {
         let view = UIView()
@@ -176,18 +176,18 @@ private extension ModalViewController {
                 rootViewController.view.forceLayout()
                 let containerHeight = rootViewController.view.frame.height
 
-                preferredHeight = containerHeight + contentSizeHeight + additionalBottomSpace
+                preferredHeight = containerHeight + contentSizeHeight + bottomSafeArea + contentInsets.bottom
             default:
                 preferredHeight = rootViewController.view.systemLayoutSizeFitting(
                     view.frame.size,
                     withHorizontalFittingPriority: .required,
                     verticalFittingPriority: .fittingSizeLevel
-                ).height + additionalBottomSpace
+                ).height + bottomSafeArea + contentInsets.bottom
         }   
 
         let height = min(view.frame.height - topSafeArea - Constants.additionalTopSpace, preferredHeight)
 
-        let topOffset = view.frame.height - height - contentInsets.top
+        let topOffset = view.frame.height - height
         let topConstraint = contentView.topAnchor.constraint(equalTo: view.topAnchor, constant: topOffset)
 
         initialTopOffset = topOffset
@@ -201,11 +201,11 @@ private extension ModalViewController {
             rootViewController.view.topAnchor.constraint(equalTo: contentView.topAnchor, constant: contentInsets.top),
             rootViewController.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: contentInsets.left),
             rootViewController.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: contentInsets.right),
-            rootViewController.view.heightAnchor.constraint(equalToConstant: height)
+            rootViewController.view.heightAnchor.constraint(equalToConstant: height - contentInsets.bottom)
         ])
 
         NSLayoutConstraint.activate([
-            dragIndicator.bottomAnchor.constraint(equalTo: contentView.topAnchor, constant: -5),
+            dragIndicator.bottomAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.DragIndicator.spacing),
             dragIndicator.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             dragIndicator.widthAnchor.constraint(equalToConstant: Constants.DragIndicator.width),
             dragIndicator.heightAnchor.constraint(equalToConstant: Constants.DragIndicator.height)
@@ -227,6 +227,7 @@ private extension ModalViewController {
         enum DragIndicator {
             static let width: CGFloat = 50
             static let height: CGFloat = 7
+            static let spacing: CGFloat = -5
         }
     }
 
