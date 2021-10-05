@@ -61,17 +61,13 @@ public class ModalViewController: UIViewController {
         UIPanGestureRecognizer(target: self, action: #selector(onDrag))
     }()
 
-    private lazy var propertyAnimator: UIViewPropertyAnimator = {
-        UIViewPropertyAnimator(duration: 0.3, curve: .easeOut)
-    }()
-
     private var contentView: UIView!
 
     private var contentInsets: UIEdgeInsets!
 
     private var animationDuration: TimeInterval = 0.3
 
-    private var yConstraint: NSLayoutConstraint!
+    private var topConstraint: NSLayoutConstraint!
 
     private var rootViewController: UIViewController!
 
@@ -97,12 +93,12 @@ extension ModalViewController {
     public func showModal() {
         navigationController?.navigationBar.toggle()
         dimmingView.layer.opacity = 0
-        yConstraint?.constant = view.frame.height
+        topConstraint?.constant = view.frame.height
         view.layoutIfNeeded()
 
         UIView.springAnimation(duration: animationDuration) { [weak self] in
             guard let self = self else { return }
-            self.yConstraint.constant = self.initialTopOffset
+            self.topConstraint.constant = self.initialTopOffset
             self.dimmingView.layer.opacity = 1
             self.view.layoutIfNeeded()
         }
@@ -112,23 +108,22 @@ extension ModalViewController {
         navigationController?.navigationBar.toggle()
         UIView.animate(withDuration: animationDuration) { [weak self] in
             guard let self = self else { return }
-            self.yConstraint.constant = self.view.frame.height
+            self.topConstraint.constant = self.view.frame.height
             self.dimmingView.layer.opacity = 0
             self.view.layoutIfNeeded()
         } completion: { [weak self] tset in
-            self?.rootViewController.view.removeFromSuperview()
+            self?.rootViewController.remove()
             self?.view.removeFromSuperview()
-            self?.rootViewController.removeFromParent()
         }
     }
 
     @objc public func onDrag(sender: UIPanGestureRecognizer) {
         switch sender.state {
             case .began:
-                initialTopOffset = yConstraint.constant
+                initialTopOffset = topConstraint.constant
             case .changed:
                 let translationY = sender.translation(in: view).y
-                yConstraint.constant = max(initialTopOffset + translationY, topSafeArea + Constants.additionalTopSpace)
+                topConstraint.constant = max(initialTopOffset + translationY, topSafeArea + Constants.additionalTopSpace)
             case .ended:
                 let translationY = sender.translation(in: view).y
                 let velocityY = sender.velocity(in: view).y
@@ -136,7 +131,7 @@ extension ModalViewController {
                     || velocityY > Constants.dismissVelocity {
                     dismissModal()
                 } else {
-                    yConstraint.constant = initialTopOffset
+                    topConstraint.constant = initialTopOffset
                     UIView.animate(withDuration: animationDuration) { [weak self] in
                         self?.view.superview?.layoutIfNeeded()
                     }
@@ -190,8 +185,8 @@ private extension ModalViewController {
         let topOffset = view.frame.height - height
         let topConstraint = contentView.topAnchor.constraint(equalTo: view.topAnchor, constant: topOffset)
 
-        initialTopOffset = topOffset
-        yConstraint = topConstraint
+        self.initialTopOffset = topOffset
+        self.topConstraint = topConstraint
 
         NSLayoutConstraint.activate([
             topConstraint,
@@ -217,6 +212,7 @@ private extension ModalViewController {
 private extension ModalViewController {
 
     enum Constants {
+
         static let cornerRadius: CGFloat = 30
         static let additionalTopSpace: CGFloat = 30
         static let dismissVelocity: CGFloat = 500
@@ -226,6 +222,7 @@ private extension ModalViewController {
             static let height: CGFloat = 7
             static let spacing: CGFloat = -5
         }
+
     }
 
 }

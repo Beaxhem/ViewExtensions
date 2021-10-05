@@ -9,6 +9,10 @@ import UIKit
 
 public extension UIViewController {
 
+    static func instantiate() -> Self {
+        return Self.init(nibName: Self.reuseIdentifier, bundle: nil)
+    }
+
     var topSafeArea: CGFloat {
         UIApplication.shared.windows.first!.safeAreaInsets.top
     }
@@ -28,8 +32,9 @@ public extension UIViewController {
         parent[keyPath: viewPath].fit(view)
     }
 
-    static func instantiate() -> Self {
-        return Self.init(nibName: Self.reuseIdentifier, bundle: nil)
+    func remove() {
+        view.removeFromSuperview()
+        removeFromParent()
     }
 
 }
