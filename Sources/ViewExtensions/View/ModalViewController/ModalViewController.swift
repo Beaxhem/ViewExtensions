@@ -84,11 +84,6 @@ public class ModalViewController: UIViewController {
         showModal()
     }
 
-    override public func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        setupRootView()
-    }
-
 }
 
 extension ModalViewController {
