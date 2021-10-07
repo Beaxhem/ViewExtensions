@@ -66,7 +66,7 @@ open class SubcontentViewController: UIViewController {
         super.preferredContentSizeDidChange(forChildContentContainer: container)
 
         if (container as? SelfSizingViewController) != nil {
-            topViewHeightConstraint?.constant = container.preferredContentSize.height
+            topViewHeightConstraint <= container.preferredContentSize.height
         }
     }
 
