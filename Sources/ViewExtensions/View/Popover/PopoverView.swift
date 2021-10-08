@@ -8,25 +8,11 @@
 import UIKit
 import SwiftUI
 
-public protocol PopoverDisplayingViewController: UIViewController {
-
-    var popover: PopoverView? { get set }
-
-}
-
-extension PopoverDisplayingViewController {
-
-    func deinitPopover() {
-        popover = nil
-    }
-
-}
-
 public class PopoverView: UIView {
 
     public static func defaultContainer() -> UIView {
         let container = UIView()
-        container.backgroundColor = .orange
+        container.backgroundColor = .white
         container.layer.cornerRadius = 10
         return container
     }
@@ -36,7 +22,7 @@ public class PopoverView: UIView {
                             targetView: UIView,
                             swooshDirection: SwooshView.Direction = .left,
                             container: UIView = defaultContainer(),
-                            maxWidth: CGFloat = 200) -> PopoverView {
+                            maxWidth: CGFloat = Constants.defaultMaxWidth) -> PopoverView {
         let popover = PopoverView(parent: parent,
                                   targetView: targetView,
                                   swooshDirection: swooshDirection,
@@ -61,6 +47,12 @@ public class PopoverView: UIView {
         swoosh.backgroundColor = .clear
         return swoosh
     }()
+
+    private var dismissTapRecognizer: UITapGestureRecognizer {
+        let recognizer = UITapGestureRecognizer(target: self, action: #selector(hide))
+        recognizer.delegate = self
+        return recognizer
+    }
 
     private weak var parent: PopoverDisplayingViewController!
 
@@ -187,12 +179,6 @@ private extension PopoverView {
         ])
     }
 
-    var dismissTapRecognizer: UITapGestureRecognizer {
-        let recognizer = UITapGestureRecognizer(target: self, action: #selector(hide))
-        recognizer.delegate = self
-        return recognizer
-    }
-
 }
 
 extension PopoverView: UIGestureRecognizerDelegate {
@@ -203,11 +189,12 @@ extension PopoverView: UIGestureRecognizerDelegate {
 
 }
 
-private extension PopoverView {
+extension PopoverView {
 
-    enum Constants {
+    public enum Constants {
         static let targetDistance: CGFloat = 20
         static let animationDuration: TimeInterval = 0.3
         static let swooshWidth: CGFloat = 30
+        public static let defaultMaxWidth: CGFloat = 200
     }
 }
