@@ -16,7 +16,8 @@ open class SelfSizingCell: UICollectionViewCell {
             guard let maxWidth = maxWidth else {
                 return
             }
-            let widthConstraint = containerView.widthAnchor.constraint(equalToConstant: maxWidth)
+
+            let widthConstraint = containerView.widthAnchor ==> maxWidth
             widthConstraint.priority = .defaultHigh
             widthConstraint.isActive = true
         }

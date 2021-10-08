@@ -12,8 +12,8 @@ public class ContainerCell: UICollectionViewCell {
     public var size: CGSize? {
         didSet {
             guard let size = size else { return }
-            contentView.widthAnchor.constraint(equalToConstant: size.width).isActive = true
-            contentView.heightAnchor.constraint(equalToConstant: size.height).isActive = true
+            (contentView.widthAnchor ==> size.width).isActive = true
+            (contentView.heightAnchor ==> size.height).isActive = true
         }
     }
 

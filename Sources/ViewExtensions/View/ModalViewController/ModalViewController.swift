@@ -16,6 +16,7 @@ public class ModalViewController: UIViewController {
                                contentView: UIView = defaultContentView,
                                contentInsets: UIEdgeInsets = defaultContentInsets,
                                animationDuration: TimeInterval = 0.5) -> ModalViewController {
+
         let modalViewController = ModalViewController()
 
         controller.dragGestureRecognizer = modalViewController.dragGestureRecognizer
@@ -93,12 +94,12 @@ extension ModalViewController {
     public func showModal() {
         navigationController?.navigationBar.toggle()
         dimmingView.layer.opacity = 0
-        topConstraint?.constant = view.frame.height
+        topConstraint <= view.frame.height
         view.layoutIfNeeded()
 
         UIView.springAnimation(duration: animationDuration) { [weak self] in
             guard let self = self else { return }
-            self.topConstraint.constant = self.initialTopOffset
+            self.topConstraint <= self.initialTopOffset
             self.dimmingView.layer.opacity = 1
             self.view.layoutIfNeeded()
         }
@@ -108,7 +109,7 @@ extension ModalViewController {
         navigationController?.navigationBar.toggle()
         UIView.animate(withDuration: animationDuration) { [weak self] in
             guard let self = self else { return }
-            self.topConstraint.constant = self.view.frame.height
+            self.topConstraint <= self.view.frame.height
             self.dimmingView.layer.opacity = 0
             self.view.layoutIfNeeded()
         } completion: { [weak self] tset in
@@ -124,7 +125,7 @@ extension ModalViewController {
                 initialTopOffset = topConstraint.constant
             case .changed:
                 let translationY = sender.translation(in: view).y
-                topConstraint.constant = max(initialTopOffset + translationY, topSafeArea + Constants.additionalTopSpace)
+                topConstraint <= max(initialTopOffset + translationY, topSafeArea + Constants.additionalTopSpace)
             case .ended:
                 let translationY = sender.translation(in: view).y
                 let velocityY = sender.velocity(in: view).y
@@ -132,7 +133,7 @@ extension ModalViewController {
                     || velocityY > Constants.dismissVelocity {
                     dismissModal()
                 } else {
-                    topConstraint.constant = initialTopOffset
+                    topConstraint <= initialTopOffset
                     UIView.animate(withDuration: animationDuration) { [weak self] in
                         self?.view.superview?.layoutIfNeeded()
                     }
@@ -184,27 +185,27 @@ private extension ModalViewController {
         let height = min(view.frame.height - topSafeArea - Constants.additionalTopSpace, preferredHeight)
 
         let topOffset = view.frame.height - height
-        let topConstraint = contentView.topAnchor.constraint(equalTo: view.topAnchor, constant: topOffset)
+        let topConstraint = contentView.topAnchor => view.topAnchor + topOffset
 
         self.initialTopOffset = topOffset
         self.topConstraint = topConstraint
 
         NSLayoutConstraint.activate([
             topConstraint,
-            contentView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            rootViewController.view.topAnchor.constraint(equalTo: contentView.topAnchor, constant: contentInsets.top),
-            rootViewController.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: contentInsets.left),
-            rootViewController.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: contentInsets.right),
-            rootViewController.view.heightAnchor.constraint(equalToConstant: height - contentInsets.bottom)
+            contentView.leadingAnchor => view.leadingAnchor,
+            contentView.trailingAnchor => view.trailingAnchor,
+            contentView.bottomAnchor => view.bottomAnchor,
+            rootViewController.view.topAnchor => contentView.topAnchor + contentInsets.top,
+            rootViewController.view.leadingAnchor => contentView.leadingAnchor + contentInsets.left,
+            rootViewController.view.trailingAnchor => contentView.trailingAnchor + contentInsets.right,
+            rootViewController.view.heightAnchor ==> (height - contentInsets.bottom)
         ])
 
         NSLayoutConstraint.activate([
-            dragIndicator.bottomAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.DragIndicator.spacing),
-            dragIndicator.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            dragIndicator.widthAnchor.constraint(equalToConstant: Constants.DragIndicator.width),
-            dragIndicator.heightAnchor.constraint(equalToConstant: Constants.DragIndicator.height)
+            dragIndicator.bottomAnchor => contentView.topAnchor + Constants.DragIndicator.spacing,
+            dragIndicator.centerXAnchor => contentView.centerXAnchor,
+            dragIndicator.widthAnchor ==> Constants.DragIndicator.width,
+            dragIndicator.heightAnchor ==> Constants.DragIndicator.height
         ])
     }
 

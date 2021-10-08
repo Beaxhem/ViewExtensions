@@ -30,15 +30,23 @@ public extension UIView {
 
     // MARK: - Layout
 
-    func fit(_ view: UIView) {
+    func fit(_ view: UIView, margins: UIEdgeInsets = .zero) {
         view.translatesAutoresizingMaskIntoConstraints = false
-        
+
         NSLayoutConstraint.activate([
-            leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            topAnchor.constraint(equalTo: view.topAnchor),
-            trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            leadingAnchor => view.leadingAnchor + margins.left,
+            topAnchor => view.topAnchor + margins.top,
+            trailingAnchor => view.trailingAnchor + margins.right,
+            bottomAnchor => view.bottomAnchor + margins.bottom
         ])
+    }
+
+    func fit(_ view: UIView, constant: CGFloat) {
+        let margins = UIEdgeInsets(top: -constant,
+                                   left: -constant,
+                                   bottom: constant,
+                                   right: constant)
+        fit(view, margins: margins)
     }
 
     func forceLayout() {
@@ -52,6 +60,5 @@ public extension UIView {
        layer.cornerRadius = radius
        layer.maskedCorners = corners
     }
-
-
+    
 }
