@@ -12,24 +12,22 @@ public class PopoverView: UIView {
 
     public static func defaultContainer() -> UIView {
         let container = UIView()
-        container.backgroundColor = .white
         container.layer.cornerRadius = 10
         return container
     }
 
     public static func show(text: String,
-                            in parent: PopoverDisplayingViewController,
+                            in parent: UIViewController,
                             targetView: UIView,
                             swooshDirection: SwooshView.Direction = .left,
                             container: UIView = defaultContainer(),
-                            maxWidth: CGFloat = Constants.defaultMaxWidth) -> PopoverView {
+                            maxWidth: CGFloat = Constants.defaultMaxWidth) {
         let popover = PopoverView(parent: parent,
                                   targetView: targetView,
                                   swooshDirection: swooshDirection,
                                   container: container,
                                   maxWidth: maxWidth)
         popover.text = text
-        return popover
     }
 
     private lazy var label: UILabel = {
@@ -54,7 +52,7 @@ public class PopoverView: UIView {
         return recognizer
     }
 
-    private weak var parent: PopoverDisplayingViewController!
+    private weak var parent: UIViewController!
 
     private weak var targetView: UIView!
 
@@ -70,7 +68,7 @@ public class PopoverView: UIView {
         }
     }
 
-    public init(parent: PopoverDisplayingViewController, targetView: UIView, swooshDirection: SwooshView.Direction, container: UIView, maxWidth: CGFloat) {
+    public init(parent: UIViewController, targetView: UIView, swooshDirection: SwooshView.Direction, container: UIView, maxWidth: CGFloat) {
         self.parent = parent
         self.swooshDirection = swooshDirection
         self.targetView = targetView
@@ -95,7 +93,6 @@ extension PopoverView {
         } completion: { [weak self] _ in
             guard let self = self else { return }
             self.removeFromSuperview()
-            self.parent.deinitPopover()
         }
     }
 
