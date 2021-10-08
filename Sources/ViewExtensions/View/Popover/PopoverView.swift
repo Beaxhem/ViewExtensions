@@ -182,8 +182,8 @@ private extension PopoverView {
             container.widthAnchor.constraint(lessThanOrEqualToConstant: maxWidth),
             trailingAnchor => container.trailingAnchor,
             bottomAnchor => container.bottomAnchor,
-            swoosh.heightAnchor ==> (Constants.swooshWidth / 1.5),
-            swoosh.widthAnchor ==> Constants.swooshWidth
+            swoosh.heightAnchor == (Constants.swooshWidth / 1.5),
+            swoosh.widthAnchor == Constants.swooshWidth
         ])
     }
 

@@ -198,14 +198,14 @@ private extension ModalViewController {
             rootViewController.view.topAnchor => contentView.topAnchor + contentInsets.top,
             rootViewController.view.leadingAnchor => contentView.leadingAnchor + contentInsets.left,
             rootViewController.view.trailingAnchor => contentView.trailingAnchor + contentInsets.right,
-            rootViewController.view.heightAnchor ==> (height - contentInsets.bottom)
+            rootViewController.view.heightAnchor == (height - contentInsets.bottom)
         ])
 
         NSLayoutConstraint.activate([
             dragIndicator.bottomAnchor => contentView.topAnchor + Constants.DragIndicator.spacing,
             dragIndicator.centerXAnchor => contentView.centerXAnchor,
-            dragIndicator.widthAnchor ==> Constants.DragIndicator.width,
-            dragIndicator.heightAnchor ==> Constants.DragIndicator.height
+            dragIndicator.widthAnchor == Constants.DragIndicator.width,
+            dragIndicator.heightAnchor == Constants.DragIndicator.height
         ])
     }
 
