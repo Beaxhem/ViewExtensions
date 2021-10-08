@@ -31,11 +31,17 @@ public class PopoverView: UIView {
         return container
     }
 
-    public static func show(text: String, in parent: PopoverDisplayingViewController, targetView: UIView, swooshDirection: SwooshView.Direction = .left, container: UIView = defaultContainer()) -> PopoverView {
+    public static func show(text: String,
+                            in parent: PopoverDisplayingViewController,
+                            targetView: UIView,
+                            swooshDirection: SwooshView.Direction = .left,
+                            container: UIView = defaultContainer(),
+                            maxWidth: CGFloat = 200) -> PopoverView {
         let popover = PopoverView(parent: parent,
                                   targetView: targetView,
                                   swooshDirection: swooshDirection,
-                                  container: container)
+                                  container: container,
+                                  maxWidth: maxWidth)
         popover.text = text
         return popover
     }
@@ -44,6 +50,8 @@ public class PopoverView: UIView {
         let label = UILabel()
         label.textAlignment = .center
         label.isUserInteractionEnabled = true
+        label.numberOfLines = 0
+        label.lineBreakMode = .byWordWrapping
         return label
     }()
 
@@ -60,7 +68,9 @@ public class PopoverView: UIView {
 
     private let container: UIView
 
-    private var swooshDirection: SwooshView.Direction
+    private let swooshDirection: SwooshView.Direction
+
+    private let maxWidth: CGFloat
 
     public var text: String? {
         didSet {
@@ -68,11 +78,12 @@ public class PopoverView: UIView {
         }
     }
 
-    public init(parent: PopoverDisplayingViewController, targetView: UIView, swooshDirection: SwooshView.Direction, container: UIView) {
+    public init(parent: PopoverDisplayingViewController, targetView: UIView, swooshDirection: SwooshView.Direction, container: UIView, maxWidth: CGFloat) {
         self.parent = parent
         self.swooshDirection = swooshDirection
         self.targetView = targetView
         self.container = container
+        self.maxWidth = maxWidth
 
         super.init(frame: .zero)
         commonInit()
@@ -168,6 +179,7 @@ private extension PopoverView {
         NSLayoutConstraint.activate([
             container.leadingAnchor => leadingAnchor,
             container.topAnchor => topAnchor,
+            container.widthAnchor.constraint(lessThanOrEqualToConstant: maxWidth),
             trailingAnchor => container.trailingAnchor,
             bottomAnchor => container.bottomAnchor,
             swoosh.heightAnchor ==> (Constants.swooshWidth / 1.5),
