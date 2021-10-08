@@ -179,7 +179,7 @@ private extension PopoverView {
         NSLayoutConstraint.activate([
             container.leadingAnchor => leadingAnchor,
             container.topAnchor => topAnchor,
-            container.widthAnchor.constraint(lessThanOrEqualToConstant: maxWidth),
+            container.widthAnchor <= maxWidth,
             trailingAnchor => container.trailingAnchor,
             bottomAnchor => container.bottomAnchor,
             swoosh.heightAnchor == (Constants.swooshWidth / 1.5),
