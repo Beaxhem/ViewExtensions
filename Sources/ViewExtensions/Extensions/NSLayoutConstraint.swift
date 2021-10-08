@@ -21,6 +21,15 @@ public func <=(lhs: NSLayoutDimension, rhs: CGFloat) -> NSLayoutConstraint {
     lhs.constraint(lessThanOrEqualToConstant: rhs)
 }
 
+infix operator >=: MultiplicationPrecedence
+public func >= <T>(lhs: NSLayoutAnchor<T>, rhs: NSLayoutAnchor<T>) -> NSLayoutConstraint {
+    lhs.constraint(greaterThanOrEqualTo: rhs)
+}
+
+public func >=(lhs: NSLayoutDimension, rhs: CGFloat) -> NSLayoutConstraint {
+    lhs.constraint(greaterThanOrEqualToConstant: rhs)
+}
+
 public func +(lhs: NSLayoutConstraint, rhs: CGFloat) -> NSLayoutConstraint {
     lhs.constant = rhs
     return lhs

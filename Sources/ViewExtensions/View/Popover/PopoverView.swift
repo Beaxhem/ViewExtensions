@@ -183,7 +183,7 @@ private extension PopoverView {
             trailingAnchor => container.trailingAnchor,
             bottomAnchor => container.bottomAnchor,
             swoosh.heightAnchor == (Constants.swooshWidth / 1.5),
-            swoosh.widthAnchor == Constants.swooshWidth
+            swoosh.widthAnchor == Constants.swooshWidth,
         ])
     }
 
