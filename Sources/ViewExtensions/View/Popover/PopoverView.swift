@@ -8,6 +8,20 @@
 import UIKit
 import SwiftUI
 
+public protocol PopoverDisplayingViewController: UIViewController {
+
+    var popover: PopoverView? { get set }
+
+}
+
+extension PopoverDisplayingViewController {
+
+    func deinitPopover() {
+        popover = nil
+    }
+
+}
+
 public class PopoverView: UIView {
 
     public static func defaultContainer() -> UIView {
@@ -17,7 +31,7 @@ public class PopoverView: UIView {
         return container
     }
 
-    public static func show(text: String, in parent: UIView, targetView: UIView, swooshDirection: SwooshView.Direction = .left, container: UIView = defaultContainer()) -> PopoverView {
+    public static func show(text: String, in parent: PopoverDisplayingViewController, targetView: UIView, swooshDirection: SwooshView.Direction = .left, container: UIView = defaultContainer()) -> PopoverView {
         let popover = PopoverView(parent: parent,
                                   targetView: targetView,
                                   swooshDirection: swooshDirection,
@@ -40,7 +54,7 @@ public class PopoverView: UIView {
         return swoosh
     }()
 
-    private weak var parent: UIView!
+    private weak var parent: PopoverDisplayingViewController!
 
     private weak var targetView: UIView!
 
@@ -54,7 +68,7 @@ public class PopoverView: UIView {
         }
     }
 
-    public init(parent: UIView, targetView: UIView, swooshDirection: SwooshView.Direction, container: UIView) {
+    public init(parent: PopoverDisplayingViewController, targetView: UIView, swooshDirection: SwooshView.Direction, container: UIView) {
         self.parent = parent
         self.swooshDirection = swooshDirection
         self.targetView = targetView
@@ -68,10 +82,6 @@ public class PopoverView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    deinit {
-        print("deinit")
-    }
-
 }
 
 extension PopoverView {
@@ -80,12 +90,9 @@ extension PopoverView {
         UIView.animate(withDuration: Constants.animationDuration) { [weak self] in
             self?.layer.opacity = 0
         } completion: { [weak self] _ in
-            print("hide")
-            self?.container.removeFromSuperview()
-            self?.swoosh.removeFromSuperview()
-            self?.targetView = nil
-            self?.parent = nil
-            self?.removeFromSuperview()
+            guard let self = self else { return }
+            self.removeFromSuperview()
+            self.parent.deinitPopover()
         }
     }
 
@@ -94,6 +101,12 @@ extension PopoverView {
 private extension PopoverView {
 
     func commonInit() {
+        parent.view.subviews
+            .filter { $0 is PopoverView }
+            .forEach { subview in
+                subview.removeFromSuperview()
+            }
+
         setupView()
         setupConstraints()
         showWithAnimation()
@@ -122,7 +135,7 @@ private extension PopoverView {
         container.fit(label, constant: 8)
 
         addSubview(container)
-        parent.addSubview(self)
+        parent.view.addSubview(self)
     }
 
     func setupConstraints() {
@@ -163,7 +176,17 @@ private extension PopoverView {
     }
 
     var dismissTapRecognizer: UITapGestureRecognizer {
-        UITapGestureRecognizer(target: self, action: #selector(hide))
+        let recognizer = UITapGestureRecognizer(target: self, action: #selector(hide))
+        recognizer.delegate = self
+        return recognizer
+    }
+
+}
+
+extension PopoverView: UIGestureRecognizerDelegate {
+
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        true
     }
 
 }
