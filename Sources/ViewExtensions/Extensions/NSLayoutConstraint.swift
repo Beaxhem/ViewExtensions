@@ -27,7 +27,6 @@ public func ==>(lhs: NSLayoutDimension, rhs: CGFloat) -> NSLayoutConstraint {
     lhs.constraint(equalToConstant: rhs)
 }
 
-infix operator <=
-public func <=(lhs: inout NSLayoutConstraint, rhs: CGFloat) {
+public func ==(lhs: inout NSLayoutConstraint, rhs: CGFloat) {
     lhs.constant = rhs
 }
