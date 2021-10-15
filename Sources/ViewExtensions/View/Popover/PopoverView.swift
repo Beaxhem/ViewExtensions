@@ -130,7 +130,9 @@ private extension PopoverView {
         addGestureRecognizer(dismissTapRecognizer)
         targetView.addGestureRecognizer(dismissTapRecognizer)
 
+        swoosh.backgroundColor = container.backgroundColor
         addSubview(swoosh)
+
         container.addSubview(label)
         container.fit(label, constant: 8)
 

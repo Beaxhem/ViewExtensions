@@ -16,10 +16,10 @@ public extension UICollectionView {
         register(cell, forCellWithReuseIdentifier: cell.reuseIdentifier)
     }
 
-    func register<T: UICollectionViewCell>(_ cell: T.Type, bundle: Bundle? = nil) {
+    func register<T: UICollectionViewCell>(_ nibCell: T.Type, bundle: Bundle? = nil) {
         register(
-            UINib(nibName: cell.reuseIdentifier, bundle: bundle ?? .module),
-            forCellWithReuseIdentifier: cell.reuseIdentifier
+            UINib(nibName: nibCell.reuseIdentifier, bundle: bundle),
+            forCellWithReuseIdentifier: nibCell.reuseIdentifier
         )
     }
 
