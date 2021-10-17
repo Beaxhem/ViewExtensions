@@ -9,9 +9,10 @@ import UIKit
 
 public class BarGraphViewController<DataProvider: BarDataProvider>: UIViewController {
 
-    public static func create(dataProvider: DataProvider) -> BarGraphViewController {
+    public static func create(dataProvider: DataProvider, styleProvider: StyleProvider? = nil) -> BarGraphViewController {
         let vc = BarGraphViewController()
         vc.dataProvider = dataProvider
+        vc.styleProvider = styleProvider
         return vc
     }
 
@@ -26,6 +27,8 @@ public class BarGraphViewController<DataProvider: BarDataProvider>: UIViewContro
         }
     }
     private var key: DataProvider.Key?
+
+    private weak var styleProvider: StyleProvider?
 
     private lazy var pageViewController: UIPageViewController = {
         UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
@@ -43,6 +46,7 @@ public class BarGraphViewController<DataProvider: BarDataProvider>: UIViewContro
         super.viewDidLoad()
 
         setupView()
+        styleView()
     }
 
     @IBAction func prevButtonTapped() {
@@ -71,7 +75,7 @@ private extension BarGraphViewController {
 
         titleLabel.text = dataProvider.title(for: key)
 
-        let vc = BarsViewController.create(data: dataProvider.data(for: key))
+        let vc = BarsViewController.create(data: dataProvider.data(for: key), styleProvider: styleProvider)
         pageViewController.setViewControllers([vc],
                                               direction: direction,
                                               animated: animated)
@@ -100,6 +104,14 @@ private extension BarGraphViewController {
             nextButton.isHidden = true
             return
         }
+    }
+
+    func styleView() {
+        guard let styleProvider = styleProvider else { return }
+
+        styleProvider.styleTitleLabel(titleLabel)
+        styleProvider.styleControlButton(previousButton)
+        styleProvider.styleControlButton(nextButton)
     }
 
 }

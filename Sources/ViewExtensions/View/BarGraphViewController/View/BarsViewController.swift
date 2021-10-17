@@ -9,9 +9,10 @@ import UIKit
 
 class BarsViewController: UIViewController {
 
-    static func create(data: [BarData]) -> BarsViewController {
+    static func create(data: [BarData], styleProvider: StyleProvider? = nil) -> BarsViewController {
         let vc = BarsViewController()
         vc.data = data
+        vc.styleProvider = styleProvider
         return vc
     }
 
@@ -25,6 +26,7 @@ class BarsViewController: UIViewController {
     }()
 
     var data: [BarData]!
+    var styleProvider: StyleProvider?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,7 +54,9 @@ extension BarsViewController: UICollectionViewDataSource {
                                          percentage: .random(in: 0...100) / 100)
 
         let cell = collectionView.dequeueCell(BarCell.self, viewModel: viewModel, for: indexPath)
+        cell.styleProvider = styleProvider
         cell.maxHeight = collectionView.frame.height
+
         return cell
     }
 

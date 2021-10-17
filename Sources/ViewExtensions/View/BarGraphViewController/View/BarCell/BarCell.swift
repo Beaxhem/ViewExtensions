@@ -16,6 +16,8 @@ class BarCell: UICollectionViewCell, ViewModelContainer {
 
     var viewModel: BarCellViewModel?
 
+    var styleProvider: StyleProvider?
+
     var maxHeight: CGFloat? {
         didSet {
             update()
@@ -35,6 +37,11 @@ class BarCell: UICollectionViewCell, ViewModelContainer {
         titleLabel.text = viewModel.title
         valueLabel.text = viewModel.value
         barViewHeightConstraint.constant = barView.frame.height * viewModel.percentage
+
+        styleProvider?.styleBar(barView)
+        styleProvider?.styleValueLabel(valueLabel)
+        styleProvider?.styleBarTitleLabel(titleLabel)
+
         layoutSubviews()
     }
 
