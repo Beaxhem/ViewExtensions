@@ -25,13 +25,12 @@ class BarCell: UICollectionViewCell, ViewModelContainer {
     }
 
     func update() {
-
         guard let viewModel = viewModel,
               let maxHeight = maxHeight else {
             return
         }
 
-        barViewHeightConstraint.constant = maxHeight
+        barViewHeightConstraint.constant = maxHeight - valueLabel.frame.height - titleLabel.frame.height - 5
         layoutSubviews()
 
         titleLabel.text = viewModel.title

@@ -35,7 +35,11 @@ class BarsViewController: UIViewController {
         view.fit(collectionView)
 
         collectionView.register(BarCell.self, bundle: .module)
-        collectionView.layoutSubviews()
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        collectionView.reloadData()
     }
 
 }
