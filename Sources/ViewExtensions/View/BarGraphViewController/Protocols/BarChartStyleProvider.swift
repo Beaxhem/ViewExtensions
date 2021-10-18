@@ -7,7 +7,7 @@
 
 import UIKit
 
-public protocol StyleProvider: AnyObject {
+public protocol BarChartStyleProvider: AnyObject {
 
     func styleTitleLabel(_ label: UILabel)
     func styleControlButton(_ button: UIButton)
