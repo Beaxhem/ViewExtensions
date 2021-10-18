@@ -9,7 +9,7 @@ import UIKit
 
 class BarsViewController: UIViewController {
 
-    static func create(data: [BarData], styleProvider: StyleProvider? = nil) -> BarsViewController {
+    static func create(data: [BarData], styleProvider: BarChartStyleProvider? = nil) -> BarsViewController {
         let vc = BarsViewController()
         vc.data = data
         vc.styleProvider = styleProvider
@@ -19,6 +19,7 @@ class BarsViewController: UIViewController {
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
+        layout.minimumInteritemSpacing = Constants.interItemSpacing
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -26,7 +27,11 @@ class BarsViewController: UIViewController {
     }()
 
     var data: [BarData]!
-    var styleProvider: StyleProvider?
+    var styleProvider: BarChartStyleProvider?
+
+    private var interItemSpacing: CGFloat {
+        styleProvider?.barsInterItemSpacing().value ?? Constants.interItemSpacing
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -69,8 +74,18 @@ extension BarsViewController: UICollectionViewDataSource {
 extension BarsViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        .init(width: (collectionView.frame.width / 7) - 10,
+        .init(width: (collectionView.frame.width - CGFloat(data.count - 1) * interItemSpacing) / CGFloat(data.count),
               height: collectionView.frame.height)
     }
 
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        interItemSpacing
+    }
+}
+
+private extension BarsViewController {
+
+    enum Constants {
+        static let interItemSpacing: CGFloat = 15
+    }
 }

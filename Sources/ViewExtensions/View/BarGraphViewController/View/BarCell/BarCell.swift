@@ -16,7 +16,7 @@ class BarCell: UICollectionViewCell, ViewModelContainer {
 
     var viewModel: BarCellViewModel?
 
-    var styleProvider: StyleProvider?
+    var styleProvider: BarChartStyleProvider?
 
     var maxHeight: CGFloat? {
         didSet {

@@ -9,7 +9,7 @@ import UIKit
 
 public class BarGraphViewController<DataProvider: BarDataProvider>: UIViewController {
 
-    public static func create(dataProvider: DataProvider, styleProvider: StyleProvider? = nil) -> BarGraphViewController {
+    public static func create(dataProvider: DataProvider, styleProvider: BarChartStyleProvider? = nil) -> BarGraphViewController {
         let vc = BarGraphViewController()
         vc.dataProvider = dataProvider
         vc.styleProvider = styleProvider
@@ -28,7 +28,7 @@ public class BarGraphViewController<DataProvider: BarDataProvider>: UIViewContro
     }
     private var key: DataProvider.Key?
 
-    private weak var styleProvider: StyleProvider?
+    private weak var styleProvider: BarChartStyleProvider?
 
     private lazy var pageViewController: UIPageViewController = {
         UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
