@@ -7,11 +7,11 @@
 
 import UIKit
 
-public enum StyleValue {
-    case value(CGFloat)
+public enum StyleValue<T> {
+    case value(T)
     case `default`
 
-    var value: CGFloat? {
+    var value: T? {
         switch self {
             case .default:
                 return nil

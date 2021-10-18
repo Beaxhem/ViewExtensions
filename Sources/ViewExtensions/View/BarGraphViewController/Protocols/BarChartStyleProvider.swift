@@ -7,8 +7,6 @@
 
 import UIKit
 
-
-
 public protocol BarChartStyleProvider: AnyObject {
 
     func styleTitleLabel(_ label: UILabel)
@@ -17,6 +15,7 @@ public protocol BarChartStyleProvider: AnyObject {
     func styleValueLabel(_ label: UILabel)
     func styleBarTitleLabel(_ label: UILabel)
 
-    func barsInterItemSpacing() -> StyleValue
+    func barsInterItemSpacing() -> StyleValue<CGFloat>
+    func barsContentInsets() -> StyleValue<UIEdgeInsets>
 
 }

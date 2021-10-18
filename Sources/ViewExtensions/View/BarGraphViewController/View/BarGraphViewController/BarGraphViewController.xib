@@ -58,7 +58,7 @@
                     </connections>
                 </button>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Sgd-1V-A4Y">
-                    <rect key="frame" x="15" y="118" width="384" height="148"/>
+                    <rect key="frame" x="0.0" y="118" width="414" height="148"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                 </view>
             </subviews>
@@ -66,7 +66,7 @@
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
                 <constraint firstItem="0yL-Eu-oA6" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="25" id="4lf-gC-rHA"/>
-                <constraint firstItem="Sgd-1V-A4Y" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="15" id="PrC-TX-R25"/>
+                <constraint firstItem="Sgd-1V-A4Y" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="PrC-TX-R25"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="Sgd-1V-A4Y" secondAttribute="bottom" constant="25" id="RvE-ol-dQe"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="e34-mC-nSe" secondAttribute="trailing" constant="15" id="TuE-Ug-RPf"/>
                 <constraint firstItem="Fm3-PI-Vg3" firstAttribute="leading" secondItem="0yL-Eu-oA6" secondAttribute="trailing" constant="20" id="WV6-sF-L5I"/>
@@ -74,7 +74,7 @@
                 <constraint firstItem="Fm3-PI-Vg3" firstAttribute="centerY" secondItem="0yL-Eu-oA6" secondAttribute="centerY" id="hYM-Po-lTe"/>
                 <constraint firstItem="e34-mC-nSe" firstAttribute="leading" secondItem="Fm3-PI-Vg3" secondAttribute="trailing" constant="20" id="r3V-mx-unU"/>
                 <constraint firstItem="e34-mC-nSe" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="25" id="rK8-a1-bGi"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="Sgd-1V-A4Y" secondAttribute="trailing" constant="15" id="ufw-FW-oN2"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="Sgd-1V-A4Y" secondAttribute="trailing" id="ufw-FW-oN2"/>
                 <constraint firstItem="Sgd-1V-A4Y" firstAttribute="top" secondItem="0yL-Eu-oA6" secondAttribute="bottom" constant="15" id="y3d-Zv-ssg"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>

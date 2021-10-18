@@ -39,6 +39,8 @@ class BarsViewController: UIViewController {
         view.addSubview(collectionView)
         view.fit(collectionView)
 
+        collectionView.contentInset = styleProvider?.barsContentInsets().value ?? .init(top: 0, left: 15, bottom: 0, right: 15)
+
         collectionView.register(BarCell.self, bundle: .module)
     }
 
@@ -74,8 +76,10 @@ extension BarsViewController: UICollectionViewDataSource {
 extension BarsViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        .init(width: (collectionView.frame.width - CGFloat(data.count - 1) * interItemSpacing) / CGFloat(data.count),
-              height: collectionView.frame.height)
+        let width = collectionView.frame.width - collectionView.contentInset.right - collectionView.contentInset.left
+
+        return .init(width: (width - CGFloat(data.count - 1) * interItemSpacing) / CGFloat(data.count),
+                     height: collectionView.frame.height)
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
