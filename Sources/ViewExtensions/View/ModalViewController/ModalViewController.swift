@@ -22,8 +22,13 @@ public class ModalViewController: UIViewController {
         modalViewController.contentInsets = contentInsets
         modalViewController.animationDuration = animationDuration
         modalViewController.rootViewController = controller
-        modalViewController.moveAndFit(to: parent)
 
+        guard let navigationController = parent.navigationController else {
+            modalViewController.moveAndFit(to: parent)
+            return modalViewController
+        }
+        modalViewController.moveAndFit(to: navigationController)
+        modalViewController.beginAppearanceTransition(true, animated: true)
         return modalViewController
     }
 
@@ -90,7 +95,6 @@ public class ModalViewController: UIViewController {
 extension ModalViewController {
 
     public func showModal() {
-        navigationController?.navigationBar.toggle()
         dimmingView.layer.opacity = 0
         topConstraint == view.frame.height
         view.layoutIfNeeded()
@@ -100,17 +104,19 @@ extension ModalViewController {
             self.topConstraint == self.initialTopOffset
             self.dimmingView.layer.opacity = 1
             self.view.layoutIfNeeded()
+            self.endAppearanceTransition()
         }
     }
 
     @objc public func dismissModal() {
-        navigationController?.navigationBar.toggle()
+        beginAppearanceTransition(false, animated: true)
         UIView.animate(withDuration: animationDuration) { [weak self] in
             guard let self = self else { return }
             self.topConstraint == self.view.frame.height
             self.dimmingView.layer.opacity = 0
             self.view.layoutIfNeeded()
         } completion: { [weak self] tset in
+            self?.endAppearanceTransition()
             self?.rootViewController.remove()
             self?.view.removeFromSuperview()
             self?.rootViewController = nil
