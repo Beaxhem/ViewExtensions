@@ -17,7 +17,7 @@ public class ModalViewController: UIViewController {
 
         let modalViewController = ModalViewController()
 
-        controller.dragGestureRecognizer = modalViewController.dragGestureRecognizer
+        controller.modalViewController = modalViewController
         modalViewController.contentView = contentView
         modalViewController.contentInsets = contentInsets
         modalViewController.animationDuration = animationDuration
@@ -56,7 +56,7 @@ public class ModalViewController: UIViewController {
         UITapGestureRecognizer(target: self, action: #selector(dismissModal))
     }()
 
-    private lazy var dragGestureRecognizer: UIPanGestureRecognizer = {
+    public lazy var dragGestureRecognizer: UIPanGestureRecognizer = {
         UIPanGestureRecognizer(target: self, action: #selector(onDrag))
     }()
 

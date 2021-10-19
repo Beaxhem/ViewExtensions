@@ -9,6 +9,6 @@ import UIKit
 
 public protocol ModalPresented: UIViewController {
 
-    var dragGestureRecognizer: UIPanGestureRecognizer? { get set }
+    var modalViewController: ModalViewController? { get set }
 
 }
