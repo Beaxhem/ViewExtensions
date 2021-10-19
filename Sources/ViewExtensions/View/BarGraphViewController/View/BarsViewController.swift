@@ -27,7 +27,8 @@ class BarsViewController: UIViewController {
     }()
 
     var data: [BarData]!
-    var styleProvider: BarChartStyleProvider?
+    
+    weak var styleProvider: BarChartStyleProvider?
 
     private var interItemSpacing: CGFloat {
         styleProvider?.barsInterItemSpacing().value ?? Constants.interItemSpacing

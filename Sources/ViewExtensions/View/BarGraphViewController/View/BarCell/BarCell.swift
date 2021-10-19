@@ -14,9 +14,9 @@ class BarCell: UICollectionViewCell, ViewModelContainer {
     @IBOutlet weak var barViewHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var titleLabel: UILabel!
 
-    var viewModel: BarCellViewModel?
+    weak var styleProvider: BarChartStyleProvider?
 
-    var styleProvider: BarChartStyleProvider?
+    var viewModel: BarCellViewModel?
 
     var maxHeight: CGFloat? {
         didSet {

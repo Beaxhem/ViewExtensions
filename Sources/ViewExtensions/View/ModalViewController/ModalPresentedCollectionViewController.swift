@@ -9,13 +9,13 @@ import UIKit
 
 open class ModalPresentedCollectionViewController: UIViewController, CollectionModalPresented {
 
-    public var dragGestureRecognizer: UIPanGestureRecognizer?
+    public var modalViewController: ModalViewController?
 
     public var _collectionView: UICollectionView!
 
     open override func viewDidLoad() {
         super.viewDidLoad()
-        dragGestureRecognizer?.delegate = self
+        modalViewController?.dragGestureRecognizer.delegate = self
         _collectionView.delegate = self
     }
 
@@ -24,7 +24,7 @@ open class ModalPresentedCollectionViewController: UIViewController, CollectionM
 extension ModalPresentedCollectionViewController: UIGestureRecognizerDelegate {
 
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        guard let dragGestureRecognizer = dragGestureRecognizer,
+        guard let dragGestureRecognizer = modalViewController?.dragGestureRecognizer,
               dragGestureRecognizer == gestureRecognizer else {
                   return false
               }
@@ -41,7 +41,7 @@ extension ModalPresentedCollectionViewController: UIGestureRecognizerDelegate {
 extension ModalPresentedCollectionViewController: UICollectionViewDelegate {
 
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard let dragGestureRecognizer = dragGestureRecognizer else {
+        guard let dragGestureRecognizer = modalViewController?.dragGestureRecognizer else {
             return
         }
 
