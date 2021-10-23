@@ -51,4 +51,3 @@ struct BarCellViewModel: ViewModel {
     var value: String
     var percentage: CGFloat
 }
-

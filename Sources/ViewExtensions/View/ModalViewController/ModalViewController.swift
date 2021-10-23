@@ -23,12 +23,11 @@ public class ModalViewController: UIViewController {
         modalViewController.animationDuration = animationDuration
         modalViewController.rootViewController = controller
 
-        guard let navigationController = parent.navigationController else {
-            modalViewController.moveAndFit(to: parent)
-            return modalViewController
-        }
-        modalViewController.moveAndFit(to: navigationController)
+        let parent = parent.navigationController ?? parent
+
         modalViewController.beginAppearanceTransition(true, animated: true)
+        modalViewController.moveAndFit(to: parent)
+        
         return modalViewController
     }
 
@@ -73,7 +72,7 @@ public class ModalViewController: UIViewController {
 
     private var topConstraint: NSLayoutConstraint!
 
-    private var rootViewController: UIViewController!
+    private weak var rootViewController: UIViewController!
 
     private var initialTopOffset: CGFloat = 0
 
@@ -104,22 +103,23 @@ extension ModalViewController {
             self.topConstraint == self.initialTopOffset
             self.dimmingView.layer.opacity = 1
             self.view.layoutIfNeeded()
-            self.endAppearanceTransition()
+        } completion: { [weak self] in
+            self?.endAppearanceTransition()
         }
     }
 
     @objc public func dismissModal() {
-        beginAppearanceTransition(false, animated: true)
         UIView.animate(withDuration: animationDuration) { [weak self] in
             guard let self = self else { return }
             self.topConstraint == self.view.frame.height
             self.dimmingView.layer.opacity = 0
             self.view.layoutIfNeeded()
         } completion: { [weak self] tset in
-            self?.endAppearanceTransition()
             self?.rootViewController.remove()
-            self?.view.removeFromSuperview()
             self?.rootViewController = nil
+            self?.willMove(toParent: nil)
+            self?.view.removeFromSuperview()
+            self?.removeFromParent()
         }
     }
 
