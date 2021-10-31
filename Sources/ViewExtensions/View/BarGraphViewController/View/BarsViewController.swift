@@ -21,6 +21,7 @@ class BarsViewController: UIViewController {
         layout.scrollDirection = .horizontal
         layout.minimumInteritemSpacing = Constants.interItemSpacing
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self
         return collectionView

@@ -23,6 +23,10 @@ public extension UICollectionView {
         )
     }
 
+    func register<T: UICollectionReusableView>(_ view: T.Type, kind: String, bundle: Bundle? = nil) {
+        register(UINib(nibName: T.reuseIdentifier, bundle: bundle), forSupplementaryViewOfKind: kind, withReuseIdentifier: T.reuseIdentifier)
+    }
+
     func dequeueCell<T: UICollectionViewCell>(_ cell: T.Type, for indexPath: IndexPath) -> T {
         dequeueReusableCell(withReuseIdentifier: T.reuseIdentifier, for: indexPath) as! T
     }
@@ -44,4 +48,9 @@ public extension UICollectionView {
         mutableVc.viewModel = viewModel
         return dequeueContainerCell(with: mutableVc, for: indexPath)
     }
+
+    func dequeueHeader<T: UICollectionReusableView>(_ supplementaryView: T.Type, for indexPath: IndexPath) -> T {
+        dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: T.reuseIdentifier, for: indexPath) as! T
+    }
+
 }
