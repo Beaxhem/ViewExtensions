@@ -12,8 +12,14 @@ public class ContainerCell: UICollectionViewCell {
     public var size: CGSize? {
         didSet {
             guard let size = size else { return }
-            (contentView.widthAnchor == size.width).isActive = true
-            (contentView.heightAnchor == size.height).isActive = true
+            NSLayoutConstraint.activate(
+                [contentView.widthAnchor == size.width,
+                 contentView.heightAnchor == size.height].map {
+                    $0.priority = .defaultHigh
+                    return $0
+                }
+            )
+
         }
     }
 

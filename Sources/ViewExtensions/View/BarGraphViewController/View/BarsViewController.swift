@@ -28,6 +28,10 @@ class BarsViewController: UIViewController {
     }()
 
     var data: [BarData]!
+
+    private lazy var maxPercentage: CGFloat = {
+        (data.max { $0.percentage < $1.percentage })?.percentage ?? 1
+    }()
     
     weak var styleProvider: BarChartStyleProvider?
 
@@ -64,7 +68,7 @@ extension BarsViewController: UICollectionViewDataSource {
         let data = data[indexPath.item]
         let viewModel = BarCellViewModel(title: data.label,
                                          value: data.value,
-                                         percentage: .random(in: 0...100) / 100)
+                                         percentage: data.percentage / maxPercentage)
 
         let cell = collectionView.dequeueCell(BarCell.self, viewModel: viewModel, for: indexPath)
         cell.styleProvider = styleProvider
