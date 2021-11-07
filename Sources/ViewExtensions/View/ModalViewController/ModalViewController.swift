@@ -35,12 +35,13 @@ public class ModalViewController: UIViewController {
         let contentView = UIView()
         contentView.backgroundColor = .white
         contentView.clipsToBounds = true
+        contentView.translatesAutoresizingMaskIntoConstraints = false
         contentView.roundCorners(corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner],
                                  radius: Constants.cornerRadius)
         return contentView
     }()
 
-    public static let defaultContentInsets: UIEdgeInsets = .init(top: 20, left: 0, bottom: 0, right: 0)
+    public static let defaultContentInsets: UIEdgeInsets = .init(top: 20, left: 0, bottom: 20, right: 0)
 
     private lazy var dimmingView: UIView = {
         let view = UIView()
@@ -72,7 +73,9 @@ public class ModalViewController: UIViewController {
 
     private var topConstraint: NSLayoutConstraint!
 
-    private weak var rootViewController: UIViewController!
+    private var heightConstraint: NSLayoutConstraint!
+
+    private weak var rootViewController: ModalPresented!
 
     private var initialTopOffset: CGFloat = 0
 
@@ -86,14 +89,19 @@ public class ModalViewController: UIViewController {
 
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        showModal()
+        showModal(isUpdate: false)
     }
 
 }
 
 extension ModalViewController {
 
-    public func showModal() {
+    public func update() {
+        setupConstraints()
+        showModal(isUpdate: true)
+    }
+
+    public func showModal(isUpdate: Bool) {
         dimmingView.layer.opacity = 0
         topConstraint == view.frame.height
         view.layoutIfNeeded()
@@ -104,7 +112,9 @@ extension ModalViewController {
             self.dimmingView.layer.opacity = 1
             self.view.layoutIfNeeded()
         } completion: { [weak self] in
-            self?.endAppearanceTransition()
+            if !isUpdate {
+                self?.endAppearanceTransition()
+            }
         }
     }
 
@@ -164,35 +174,26 @@ private extension ModalViewController {
     func setupConstraints() {
         let additionalBottomSpace = bottomSafeArea + contentInsets.bottom
 
-        var preferredHeight: CGFloat
-        switch rootViewController {
-            case is ModalPresentedCollectionViewController:
-                guard let rootViewController = rootViewController as? ModalPresentedCollectionViewController else {
-                    return
-                }
+        rootViewController.view.translatesAutoresizingMaskIntoConstraints = false
+        rootViewController.view.layoutIfNeeded()
 
-                rootViewController._collectionView.layoutSubviews()
-                let contentSizeHeight = rootViewController._collectionView.collectionViewLayout.collectionViewContentSize.height
-
-                rootViewController.view.forceLayout()
-                let containerHeight = rootViewController.view.frame.height
-
-                preferredHeight = containerHeight + contentSizeHeight + additionalBottomSpace
-            default:
-                preferredHeight = rootViewController.view.systemLayoutSizeFitting(
-                    view.frame.size,
-                    withHorizontalFittingPriority: .required,
-                    verticalFittingPriority: .fittingSizeLevel
-                ).height + additionalBottomSpace
-        }   
-
+        let preferredHeight = rootViewController.contentHeight + additionalBottomSpace
         let height = min(view.frame.height - topSafeArea - Constants.additionalTopSpace, preferredHeight)
-
         let topOffset = view.frame.height - height
-        let topConstraint = contentView.topAnchor => view.topAnchor + topOffset
-
         self.initialTopOffset = topOffset
-        self.topConstraint = topConstraint
+
+        if let topConstraint = self.topConstraint {
+            topConstraint.constant = topOffset
+        } else {
+            topConstraint = contentView.topAnchor => view.topAnchor + topOffset
+        }
+
+        if let heightConstraint = heightConstraint {
+            heightConstraint.constant = height - contentInsets.bottom
+        } else {
+            heightConstraint = rootViewController.view.heightAnchor == (height - contentInsets.bottom)
+            heightConstraint.priority = .defaultHigh
+        }
 
         NSLayoutConstraint.activate([
             topConstraint,
@@ -202,7 +203,7 @@ private extension ModalViewController {
             rootViewController.view.topAnchor => contentView.topAnchor + contentInsets.top,
             rootViewController.view.leadingAnchor => contentView.leadingAnchor + contentInsets.left,
             rootViewController.view.trailingAnchor => contentView.trailingAnchor + contentInsets.right,
-            rootViewController.view.heightAnchor == (height - contentInsets.bottom)
+            heightConstraint
         ])
 
         NSLayoutConstraint.activate([
@@ -232,3 +233,4 @@ private extension ModalViewController {
     }
 
 }
+
