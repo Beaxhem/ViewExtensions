@@ -33,7 +33,7 @@ public class ModalViewController: UIViewController {
 
     public static var defaultContentView: UIView = {
         let contentView = UIView()
-        contentView.backgroundColor = .white
+        contentView.backgroundColor = .systemBackground
         contentView.clipsToBounds = true
         contentView.translatesAutoresizingMaskIntoConstraints = false
         contentView.roundCorners(corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner],
