@@ -11,4 +11,6 @@ public protocol ModalPresented: UIViewController {
 
     var modalViewController: ModalViewController? { get set }
 
+    var _contentHeight: CGFloat { get }
+
 }

@@ -2,7 +2,7 @@
 //  ModalPresentedCollectionViewController.swift
 //  
 //
-//  Created by Ilya Senchukov on 04.10.2021.
+//  Created by Ilya Senchukov on 07.11.2021.
 //
 
 import UIKit
@@ -11,7 +11,24 @@ open class ModalPresentedCollectionViewController: UIViewController, CollectionM
 
     public var modalViewController: ModalViewController?
 
-    public var _collectionView: UICollectionView!
+    open var _collectionView: UICollectionView! {
+        nil
+    }
+
+    public var contentHeight: CGFloat? {
+        didSet {
+            modalViewController?.update()
+        }
+    }
+
+    public var _contentHeight: CGFloat {
+        contentHeight ?? 0
+    }
+
+    open override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        contentHeight = _collectionView.collectionViewLayout.collectionViewContentSize.height
+    }
 
     open override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,3 +69,4 @@ extension ModalPresentedCollectionViewController: UICollectionViewDelegate {
         }
     }
 }
+
