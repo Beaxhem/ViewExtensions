@@ -9,17 +9,29 @@ import UIKit
 
 public class ContainerCell: UICollectionViewCell {
 
+    private var widthConstraint: NSLayoutConstraint?
+    private var heightConstraint: NSLayoutConstraint?
+
     public var size: CGSize? {
         didSet {
             guard let size = size else { return }
-            NSLayoutConstraint.activate(
-                [contentView.widthAnchor == size.width,
-                 contentView.heightAnchor == size.height].map {
-                    $0.priority = .defaultHigh
-                    return $0
-                }
-            )
 
+            if var widthConstraint = widthConstraint {
+                widthConstraint == size.width
+            } else {
+                widthConstraint = contentView.widthAnchor == size.width
+            }
+
+            if var heightConstraint = heightConstraint {
+                heightConstraint == size.height
+            } else {
+                heightConstraint = contentView.heightAnchor == size.height
+            }
+
+            NSLayoutConstraint.activate([widthConstraint, heightConstraint].compactMap {
+                $0?.priority = .defaultHigh
+                return $0
+            })
         }
     }
 
