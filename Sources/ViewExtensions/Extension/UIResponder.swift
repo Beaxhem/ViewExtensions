@@ -7,9 +7,9 @@
 
 import UIKit
 
-public extension UIResponder {
+extension UIResponder {
 
-    class var reuseIdentifier: String {
+    @objc open class var reuseIdentifier: String {
         String(describing: Self.self)
     }
 
