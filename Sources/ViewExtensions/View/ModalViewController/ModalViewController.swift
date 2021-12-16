@@ -11,15 +11,15 @@ public class ModalViewController: UIViewController {
 
     public static func present(in parent: UIViewController,
                                controller: ModalPresented,
-                               contentView: UIView = defaultContentView,
-                               contentInsets: UIEdgeInsets = defaultContentInsets,
-                               animationDuration: TimeInterval = 0.5) -> ModalViewController {
+                               contentInsets: UIEdgeInsets? = nil,
+                               animationDuration: TimeInterval = 0.3) -> ModalViewController {
 
         let modalViewController = ModalViewController()
 
         controller.modalViewController = modalViewController
-        modalViewController.contentView = contentView
-        modalViewController.contentInsets = contentInsets
+        modalViewController.dimmingView = controller.dimmingView ?? Self.defaultDimmingView
+        modalViewController.contentView = controller.contentView ?? Self.defaultContentView
+        modalViewController.contentInsets = contentInsets ?? Self.defaultContentInsets
         modalViewController.animationDuration = animationDuration
         modalViewController.rootViewController = controller
 
@@ -31,7 +31,7 @@ public class ModalViewController: UIViewController {
         return modalViewController
     }
 
-    public static var defaultContentView: UIView = {
+    private static var defaultContentView: UIView = {
         let contentView = UIView()
         contentView.backgroundColor = .systemBackground
         contentView.clipsToBounds = true
@@ -41,23 +41,23 @@ public class ModalViewController: UIViewController {
         return contentView
     }()
 
-    public static let defaultContentInsets: UIEdgeInsets = .init(top: 20, left: 0, bottom: 20, right: 0)
-
-    public lazy var maxHeight: CGFloat = {
-        view.frame.height - Constants.additionalTopSpace - topSafeArea
-    }()
-
-    public var isAnimating: Bool = false
-    
-    private lazy var dimmingView: UIView = {
+    private static var defaultDimmingView: UIView = {
         let view = UIView()
         view.backgroundColor = .black.withAlphaComponent(0.2)
         return view
     }()
 
+    private static let defaultContentInsets: UIEdgeInsets = .init(top: 20, left: 0, bottom: 20, right: 0)
+
+    public lazy var maxHeight: CGFloat = {
+        view.frame.height - topSafeArea
+    }()
+
+    public var isAnimating: Bool = false
+
     private lazy var dragIndicator: UIView = {
         let dragIndicator = UIView()
-        dragIndicator.backgroundColor = .white
+        dragIndicator.backgroundColor = .gray
         dragIndicator.layer.cornerRadius = 4
         dragIndicator.translatesAutoresizingMaskIntoConstraints = false
         return dragIndicator
@@ -71,21 +71,27 @@ public class ModalViewController: UIViewController {
         UIPanGestureRecognizer(target: self, action: #selector(onDrag))
     }()
 
+    public weak var rootViewController: ModalPresented!
+    
     public weak var delegate: ModalViewDelegate?
+
+    private var dimmingView: UIView!
 
     private var contentView: UIView!
 
     private var contentInsets: UIEdgeInsets!
 
-    private var animationDuration: TimeInterval = 0.3
-
-    private var topConstraint: NSLayoutConstraint!
+    private var animationDuration: TimeInterval!
 
     private var heightConstraint: NSLayoutConstraint!
 
-    private weak var rootViewController: ModalPresented!
-
     private var initialTopOffset: CGFloat = 0
+
+    var topConstraint: NSLayoutConstraint!
+
+    public var topOffset: CGFloat {
+        topConstraint.constant
+    }
 
     override public func viewDidLoad() {
         super.viewDidLoad()
@@ -152,9 +158,7 @@ extension ModalViewController {
             self?.rootViewController.remove()
             self?.rootViewController = nil
             self?.willMove(toParent: nil)
-            self?.view.removeFromSuperview()
-            self?.removeFromParent()
-
+            self?.remove()
         }
     }
 
@@ -164,7 +168,7 @@ extension ModalViewController {
                 initialTopOffset = topConstraint.constant
             case .changed:
                 let translationY = sender.translation(in: view).y
-                topConstraint == max(initialTopOffset + translationY, topSafeArea + Constants.additionalTopSpace)
+                topConstraint == max(initialTopOffset + translationY, topSafeArea)
                 delegate?.didScroll?(offsetY: translationY)
             case .ended:
                 let translationY = sender.translation(in: view).y
@@ -204,8 +208,8 @@ private extension ModalViewController {
         rootViewController.view.translatesAutoresizingMaskIntoConstraints = false
         rootViewController.view.layoutIfNeeded()
 
-        let preferredHeight = rootViewController._contentHeight + additionalBottomSpace
-        let height = min(view.frame.height - topSafeArea - Constants.additionalTopSpace, preferredHeight)
+        let preferredHeight = rootViewController.clampedContentHeight + additionalBottomSpace
+        let height = min(maxHeight, preferredHeight)
         let topOffset = view.frame.height - height
         self.initialTopOffset = topOffset
 
@@ -247,17 +251,16 @@ private extension ModalViewController {
 
     enum Constants {
 
-        static let cornerRadius: CGFloat = 30
+        static let cornerRadius: CGFloat = 40
         static let additionalTopSpace: CGFloat = 30
         static let dismissVelocity: CGFloat = 500
 
         enum DragIndicator {
-            static let width: CGFloat = 50
-            static let height: CGFloat = 7
-            static let spacing: CGFloat = -5
+            static let width: CGFloat = 30
+            static let height: CGFloat = 5
+            static let spacing: CGFloat = 10
         }
 
     }
 
 }
-
