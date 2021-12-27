@@ -9,14 +9,13 @@ import UIKit
 
 // MARK: Equal
 
-infix operator =>: MultiplicationPrecedence
-public func => <T>(lhs: NSLayoutAnchor<T>, rhs: NSLayoutAnchor<T>) -> NSLayoutConstraint {
+infix operator -->: MultiplicationPrecedence
+public func --> <T>(lhs: NSLayoutAnchor<T>, rhs: NSLayoutAnchor<T>) -> NSLayoutConstraint {
     lhs.constraint(equalTo: rhs)
 }
 
 // MARK: Less than or equal
 
-infix operator <=: MultiplicationPrecedence
 public func <= <T>(lhs: NSLayoutAnchor<T>, rhs: NSLayoutAnchor<T>) -> NSLayoutConstraint {
     lhs.constraint(lessThanOrEqualTo: rhs)
 }
@@ -27,7 +26,6 @@ public func <=(lhs: NSLayoutDimension, rhs: CGFloat) -> NSLayoutConstraint {
 
 // MARK: Greater than or equal
 
-infix operator >=: MultiplicationPrecedence
 public func >= <T>(lhs: NSLayoutAnchor<T>, rhs: NSLayoutAnchor<T>) -> NSLayoutConstraint {
     lhs.constraint(greaterThanOrEqualTo: rhs)
 }

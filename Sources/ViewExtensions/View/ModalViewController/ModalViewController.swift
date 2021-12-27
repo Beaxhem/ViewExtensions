@@ -57,8 +57,8 @@ public class ModalViewController: UIViewController {
 
     private lazy var dragIndicator: UIView = {
         let dragIndicator = UIView()
-        dragIndicator.backgroundColor = .gray
-        dragIndicator.layer.cornerRadius = 4
+        dragIndicator.backgroundColor = .lightGray
+        dragIndicator.layer.cornerRadius = 2.5
         dragIndicator.translatesAutoresizingMaskIntoConstraints = false
         return dragIndicator
     }()
@@ -93,9 +93,16 @@ public class ModalViewController: UIViewController {
         topConstraint.constant
     }
 
+    public var isLocked: Bool = false {
+        didSet {
+            dragGestureRecognizer.isEnabled = !isLocked
+        }
+    }
+
     override public func viewDidLoad() {
         super.viewDidLoad()
         contentView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.layer.masksToBounds = true
         setupView()
         dimmingView.addGestureRecognizer(dismissTapGestureRecognizer)
         rootViewController.view.addGestureRecognizer(dragGestureRecognizer)
@@ -167,14 +174,15 @@ extension ModalViewController {
             case .began:
                 initialTopOffset = topConstraint.constant
             case .changed:
-                let translationY = sender.translation(in: view).y
-                topConstraint == max(initialTopOffset + translationY, topSafeArea)
+                let translationY = sender.translation(in: view).y / 2
+                let newOffset = initialTopOffset + translationY
+                topConstraint == max(newOffset, topSafeArea)
                 delegate?.didScroll?(offsetY: translationY)
             case .ended:
                 let translationY = sender.translation(in: view).y
                 let velocityY = sender.velocity(in: view).y
                 if translationY > rootViewController.view.frame.height / 2
-                    || velocityY > Constants.dismissVelocity {
+                    || (velocityY > Constants.dismissVelocity && translationY > 100) {
                     dismissModal()
                 } else {
                     topConstraint == initialTopOffset
@@ -216,7 +224,7 @@ private extension ModalViewController {
         if let topConstraint = self.topConstraint {
             topConstraint.constant = topOffset
         } else {
-            topConstraint = contentView.topAnchor => view.topAnchor + topOffset
+            topConstraint = contentView.topAnchor --> view.topAnchor + topOffset
         }
 
         if var heightConstraint = heightConstraint {
@@ -228,18 +236,18 @@ private extension ModalViewController {
 
         NSLayoutConstraint.activate([
             topConstraint,
-            contentView.leadingAnchor => view.leadingAnchor,
-            contentView.trailingAnchor => view.trailingAnchor,
-            contentView.bottomAnchor => view.bottomAnchor,
-            rootViewController.view.topAnchor => contentView.topAnchor + contentInsets.top,
-            rootViewController.view.leadingAnchor => contentView.leadingAnchor + contentInsets.left,
-            rootViewController.view.trailingAnchor => contentView.trailingAnchor + contentInsets.right,
+            contentView.leadingAnchor --> view.leadingAnchor,
+            contentView.trailingAnchor --> view.trailingAnchor,
+            contentView.bottomAnchor --> view.bottomAnchor,
+            rootViewController.view.topAnchor --> contentView.topAnchor + contentInsets.top,
+            rootViewController.view.leadingAnchor --> contentView.leadingAnchor + contentInsets.left,
+            rootViewController.view.trailingAnchor --> contentView.trailingAnchor + contentInsets.right,
             heightConstraint
         ])
 
         NSLayoutConstraint.activate([
-            dragIndicator.bottomAnchor => contentView.topAnchor + Constants.DragIndicator.spacing,
-            dragIndicator.centerXAnchor => contentView.centerXAnchor,
+            dragIndicator.bottomAnchor --> contentView.topAnchor + Constants.DragIndicator.spacing,
+            dragIndicator.centerXAnchor --> contentView.centerXAnchor,
             dragIndicator.widthAnchor == Constants.DragIndicator.width,
             dragIndicator.heightAnchor == Constants.DragIndicator.height
         ])
@@ -256,7 +264,7 @@ private extension ModalViewController {
         static let dismissVelocity: CGFloat = 500
 
         enum DragIndicator {
-            static let width: CGFloat = 30
+            static let width: CGFloat = 35
             static let height: CGFloat = 5
             static let spacing: CGFloat = 10
         }

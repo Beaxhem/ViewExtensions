@@ -90,4 +90,8 @@ extension ModalCollectionViewDelegate: UICollectionViewDelegate {
 
         }
     }
+
+    public func scrollViewDidChangeAdjustedContentInset(_ scrollView: UIScrollView) {
+        scrollView.scrollToTop()
+    }
 }

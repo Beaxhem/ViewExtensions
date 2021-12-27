@@ -34,10 +34,10 @@ public extension UIView {
         view.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            leadingAnchor => view.leadingAnchor + margins.left,
-            topAnchor => view.topAnchor + margins.top,
-            trailingAnchor => view.trailingAnchor + margins.right,
-            bottomAnchor => view.bottomAnchor + margins.bottom
+            leadingAnchor --> view.leadingAnchor + margins.left,
+            topAnchor --> view.topAnchor + margins.top,
+            trailingAnchor --> view.trailingAnchor + margins.right,
+            bottomAnchor --> view.bottomAnchor + margins.bottom
         ])
     }
 
