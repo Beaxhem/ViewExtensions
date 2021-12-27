@@ -85,7 +85,7 @@ extension ModalCollectionViewDelegate: UICollectionViewDelegate {
         let offset = collectionView.contentOffset.y
         let translation = modalViewController.dragGestureRecognizer.translation(in: collectionView.superview).y
 
-        if offset < 0 || translation > 0 || modalViewController.topConstraint.constant > modalViewController.topSafeArea {
+        if offset < 0 || translation > 0 || modalViewController.topOffset > modalViewController.topSafeArea {
             collectionView.contentOffset.y = 0
 
         }

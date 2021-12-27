@@ -23,10 +23,8 @@ public class ModalViewController: UIViewController {
         modalViewController.animationDuration = animationDuration
         modalViewController.rootViewController = controller
 
-        let parent = parent.navigationController ?? parent
-
         modalViewController.beginAppearanceTransition(true, animated: true)
-        modalViewController.moveAndFit(to: parent)
+        modalViewController.moveAndFit(to: parent.navigationController ?? parent)
         
         return modalViewController
     }
@@ -47,13 +45,11 @@ public class ModalViewController: UIViewController {
         return view
     }()
 
-    private static let defaultContentInsets: UIEdgeInsets = .init(top: 20, left: 0, bottom: 20, right: 0)
+    private static let defaultContentInsets = UIEdgeInsets(top: 20, left: 0, bottom: 20, right: 0)
 
-    public lazy var maxHeight: CGFloat = {
-        view.frame.height - topSafeArea
-    }()
+    public lazy var maxHeight: CGFloat = view.frame.height - topSafeArea
 
-    public var isAnimating: Bool = false
+    public var isAnimating = false
 
     private lazy var dragIndicator: UIView = {
         let dragIndicator = UIView()
@@ -63,13 +59,9 @@ public class ModalViewController: UIViewController {
         return dragIndicator
     }()
 
-    private lazy var dismissTapGestureRecognizer: UITapGestureRecognizer = {
-        UITapGestureRecognizer(target: self, action: #selector(dismissModal))
-    }()
+    private lazy var dismissTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissModal))
 
-    public lazy var dragGestureRecognizer: UIPanGestureRecognizer = {
-        UIPanGestureRecognizer(target: self, action: #selector(onDrag))
-    }()
+    public lazy var dragGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(onDrag))
 
     public weak var rootViewController: ModalPresented!
     
@@ -79,18 +71,25 @@ public class ModalViewController: UIViewController {
 
     private var contentView: UIView!
 
-    private var contentInsets: UIEdgeInsets!
-
     private var animationDuration: TimeInterval!
-
-    private var heightConstraint: NSLayoutConstraint!
 
     private var initialTopOffset: CGFloat = 0
 
-    var topConstraint: NSLayoutConstraint!
+    private var rootViewControllerContraints: Constraints?
+
+    private var contentViewConstraints: Constraints?
+
+    private var dragIndicatorConstraints: Constraints?
+
+    public var contentInsets: UIEdgeInsets! {
+        didSet {
+            guard let _ = rootViewControllerContraints else { return }
+            update()
+        }
+    }
 
     public var topOffset: CGFloat {
-        topConstraint.constant
+        contentViewConstraints!.topConstraint!.constant
     }
 
     public var isLocked: Bool = false {
@@ -104,6 +103,7 @@ public class ModalViewController: UIViewController {
         contentView.translatesAutoresizingMaskIntoConstraints = false
         contentView.layer.masksToBounds = true
         setupView()
+        setupConstraints()
         dimmingView.addGestureRecognizer(dismissTapGestureRecognizer)
         rootViewController.view.addGestureRecognizer(dragGestureRecognizer)
     }
@@ -115,49 +115,53 @@ public class ModalViewController: UIViewController {
 
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        showModal(isUpdate: false)
+        showModal()
+    }
+
+    func setupView() {
+        view.addSubview(dimmingView)
+        view.fit(dimmingView)
+        view.addSubview(contentView)
+        rootViewController?.move(to: self, viewPath: \.contentView)
+        view.addSubview(dragIndicator)
     }
 
 }
 
-extension ModalViewController {
+public extension ModalViewController {
 
-    public func update() {
-        setupConstraints()
-        if isAnimating {
-            showModal(isUpdate: true)
-        } else {
-            UIView.animate(withDuration: animationDuration) {
-                self.topConstraint == self.initialTopOffset
-                self.view.layoutIfNeeded()
+    func update(animated: Bool = true) {
+        if animated {
+            UIView.animate(withDuration: 0.2) { [weak self] in
+                self?.setupConstraints()
+                self?.view.layoutIfNeeded()
             }
+        } else {
+            setupConstraints()
         }
-
     }
 
-    public func showModal(isUpdate: Bool) {
+    func showModal() {
         dimmingView.layer.opacity = 0
-        topConstraint == view.frame.height
+        contentViewConstraints?.update(top: view.frame.height)
         view.layoutIfNeeded()
         isAnimating = true
         UIView.springAnimation(duration: animationDuration) { [weak self] in
             guard let self = self else { return }
-            self.topConstraint == self.initialTopOffset
+            self.contentViewConstraints?.update(top: self.initialTopOffset)
             self.dimmingView.layer.opacity = 1
             self.view.layoutIfNeeded()
         } completion: { [weak self] in
             self?.isAnimating = false
-            if !isUpdate {
-                self?.endAppearanceTransition()
-            }
+            self?.endAppearanceTransition()
         }
     }
 
-    @objc public func dismissModal() {
+    @objc func dismissModal() {
         isAnimating = true
         UIView.animate(withDuration: animationDuration) { [weak self] in
             guard let self = self else { return }
-            self.topConstraint == self.view.frame.height
+            self.contentViewConstraints?.update(top: self.view.frame.height)
             self.dimmingView.layer.opacity = 0
             self.view.layoutIfNeeded()
         } completion: { [weak self] tset in
@@ -169,14 +173,14 @@ extension ModalViewController {
         }
     }
 
-    @objc public func onDrag(sender: UIPanGestureRecognizer) {
+    @objc func onDrag(sender: UIPanGestureRecognizer) {
         switch sender.state {
             case .began:
-                initialTopOffset = topConstraint.constant
+                initialTopOffset = contentViewConstraints!.topConstraint!.constant
             case .changed:
                 let translationY = sender.translation(in: view).y / 2
                 let newOffset = initialTopOffset + translationY
-                topConstraint == max(newOffset, topSafeArea)
+                contentViewConstraints?.update(top: max(newOffset, topSafeArea))
                 delegate?.didScroll?(offsetY: translationY)
             case .ended:
                 let translationY = sender.translation(in: view).y
@@ -185,7 +189,7 @@ extension ModalViewController {
                     || (velocityY > Constants.dismissVelocity && translationY > 100) {
                     dismissModal()
                 } else {
-                    topConstraint == initialTopOffset
+                    self.contentViewConstraints?.update(top: initialTopOffset)
                     UIView.animate(withDuration: animationDuration) { [weak self] in
                         self?.view.superview?.layoutIfNeeded()
                     }
@@ -200,16 +204,6 @@ extension ModalViewController {
 
 private extension ModalViewController {
 
-    func setupView() {
-        view.addSubview(dimmingView)
-        view.fit(dimmingView)
-        view.addSubview(contentView)
-        rootViewController?.move(to: self, viewPath: \.contentView)
-        view.addSubview(dragIndicator)
-
-        setupConstraints()
-    }
-
     func setupConstraints() {
         let additionalBottomSpace = bottomSafeArea + contentInsets.bottom
 
@@ -221,36 +215,33 @@ private extension ModalViewController {
         let topOffset = view.frame.height - height
         self.initialTopOffset = topOffset
 
-        if let topConstraint = self.topConstraint {
-            topConstraint.constant = topOffset
+        if let contentViewConstraints = contentViewConstraints {
+            contentViewConstraints.update(top: topOffset)
         } else {
-            topConstraint = contentView.topAnchor --> view.topAnchor + topOffset
+            contentViewConstraints = .init(
+                topConstraint: contentView.topAnchor --> view.topAnchor + topOffset,
+                leadingConstraint: contentView.leadingAnchor --> view.leadingAnchor,
+                trailingConstraint: contentView.trailingAnchor --> view.trailingAnchor,
+                bottomConstraint: contentView.bottomAnchor --> view.bottomAnchor)
         }
 
-        if var heightConstraint = heightConstraint {
-            heightConstraint == height - contentInsets.bottom
+        if let rootViewControllerContraints = rootViewControllerContraints {
+            rootViewControllerContraints.update(top: contentInsets.top,
+                                                height: height - contentInsets.bottom)
         } else {
-            heightConstraint = rootViewController.view.heightAnchor == (height - contentInsets.bottom)
+            let heightConstraint = rootViewController.view.heightAnchor == (height - contentInsets.bottom)
             heightConstraint.priority = .defaultHigh
+            rootViewControllerContraints = .init(
+                topConstraint: rootViewController.view.topAnchor --> contentView.topAnchor + contentInsets.top,
+                leadingConstraint: rootViewController.view.leadingAnchor --> contentView.leadingAnchor + contentInsets.left,
+                trailingConstraint: rootViewController.view.trailingAnchor --> contentView.trailingAnchor + contentInsets.right,
+                heightConstraint: heightConstraint)
         }
 
-        NSLayoutConstraint.activate([
-            topConstraint,
-            contentView.leadingAnchor --> view.leadingAnchor,
-            contentView.trailingAnchor --> view.trailingAnchor,
-            contentView.bottomAnchor --> view.bottomAnchor,
-            rootViewController.view.topAnchor --> contentView.topAnchor + contentInsets.top,
-            rootViewController.view.leadingAnchor --> contentView.leadingAnchor + contentInsets.left,
-            rootViewController.view.trailingAnchor --> contentView.trailingAnchor + contentInsets.right,
-            heightConstraint
-        ])
-
-        NSLayoutConstraint.activate([
-            dragIndicator.bottomAnchor --> contentView.topAnchor + Constants.DragIndicator.spacing,
-            dragIndicator.centerXAnchor --> contentView.centerXAnchor,
-            dragIndicator.widthAnchor == Constants.DragIndicator.width,
-            dragIndicator.heightAnchor == Constants.DragIndicator.height
-        ])
+        dragIndicatorConstraints = .init(bottomConstraint: dragIndicator.bottomAnchor --> contentView.topAnchor + Constants.DragIndicator.spacing,
+                                         heightConstraint: dragIndicator.heightAnchor == Constants.DragIndicator.height,
+                                         widthConstraint: dragIndicator.widthAnchor == Constants.DragIndicator.width,
+                                         centerXConstraint: dragIndicator.centerXAnchor --> contentView.centerXAnchor)
     }
 
 }
