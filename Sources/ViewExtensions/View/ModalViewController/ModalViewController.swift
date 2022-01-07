@@ -130,9 +130,9 @@ public class ModalViewController: UIViewController {
 
 public extension ModalViewController {
 
-    func update(animated: Bool = true) {
+    func update(duration: TimeInterval = 0.2, animated: Bool = true) {
         if animated {
-            UIView.animate(withDuration: 0.2) { [weak self] in
+            UIView.animate(withDuration: duration) { [weak self] in
                 self?.setupConstraints()
                 self?.view.layoutIfNeeded()
             }

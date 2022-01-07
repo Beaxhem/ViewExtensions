@@ -12,7 +12,7 @@ open class SelfSizingCell: UICollectionViewCell {
     private var maxWidthConstraint: NSLayoutConstraint?
     private var maxHeightConstraint: NSLayoutConstraint?
 
-    public var maxWidth: CGFloat? {
+    open var maxWidth: CGFloat? {
         didSet {
             guard let maxWidth = maxWidth else {
                 return

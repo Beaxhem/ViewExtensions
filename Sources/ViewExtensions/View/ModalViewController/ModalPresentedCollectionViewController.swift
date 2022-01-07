@@ -55,7 +55,7 @@ open class ModalPresentedCollectionViewController: UIViewController, CollectionM
 
 public class ModalCollectionViewDelegate: NSObject, UIGestureRecognizerDelegate {
 
-    public var modalViewController: ModalViewController?
+    public weak var modalViewController: ModalViewController?
     public weak var collectionView: UICollectionView?
 
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
