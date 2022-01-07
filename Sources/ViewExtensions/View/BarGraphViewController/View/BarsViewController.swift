@@ -21,13 +21,19 @@ class BarsViewController: UIViewController {
         layout.scrollDirection = .horizontal
         layout.minimumInteritemSpacing = Constants.interItemSpacing
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .clear
         collectionView.dataSource = self
         collectionView.delegate = self
         return collectionView
     }()
 
     var data: [BarData]!
-    var styleProvider: BarChartStyleProvider?
+
+    private lazy var maxPercentage: CGFloat = {
+        (data.max { $0.percentage < $1.percentage })?.percentage ?? 1
+    }()
+    
+    weak var styleProvider: BarChartStyleProvider?
 
     private var interItemSpacing: CGFloat {
         styleProvider?.barsInterItemSpacing().value ?? Constants.interItemSpacing
@@ -62,7 +68,7 @@ extension BarsViewController: UICollectionViewDataSource {
         let data = data[indexPath.item]
         let viewModel = BarCellViewModel(title: data.label,
                                          value: data.value,
-                                         percentage: .random(in: 0...100) / 100)
+                                         percentage: data.percentage / maxPercentage)
 
         let cell = collectionView.dequeueCell(BarCell.self, viewModel: viewModel, for: indexPath)
         cell.styleProvider = styleProvider

@@ -145,34 +145,34 @@ private extension PopoverView {
 
         switch swooshDirection {
             case .down, .up:
-                constraints.append(swoosh.centerXAnchor => targetView.centerXAnchor)
-                constraints.append(centerXAnchor => targetView.centerXAnchor)
+                constraints.append(swoosh.centerXAnchor --> targetView.centerXAnchor)
+                constraints.append(centerXAnchor --> targetView.centerXAnchor)
             case .left, .right:
-                constraints.append(swoosh.centerYAnchor => targetView.centerYAnchor)
-                constraints.append(centerYAnchor => targetView.centerYAnchor)
+                constraints.append(swoosh.centerYAnchor --> targetView.centerYAnchor)
+                constraints.append(centerYAnchor --> targetView.centerYAnchor)
         }
 
         switch swooshDirection {
             case .up:
-                constraints.append(topAnchor => targetView.bottomAnchor + Constants.targetDistance)
+                constraints.append(topAnchor --> targetView.bottomAnchor + Constants.targetDistance)
             case .right:
-                constraints.append(swoosh.trailingAnchor => container.trailingAnchor + 8)
-                constraints.append(trailingAnchor => targetView.leadingAnchor - Constants.targetDistance)
+                constraints.append(swoosh.trailingAnchor --> container.trailingAnchor + 8)
+                constraints.append(trailingAnchor --> targetView.leadingAnchor - Constants.targetDistance)
             case .down:
-                constraints.append(swoosh.bottomAnchor => container.bottomAnchor)
-                constraints.append(bottomAnchor => targetView.topAnchor - Constants.targetDistance)
+                constraints.append(swoosh.bottomAnchor --> container.bottomAnchor)
+                constraints.append(bottomAnchor --> targetView.topAnchor - Constants.targetDistance)
             case .left:
-                constraints.append(swoosh.leadingAnchor => container.leadingAnchor - 8)
-                constraints.append(leadingAnchor => targetView.trailingAnchor + Constants.targetDistance)
+                constraints.append(swoosh.leadingAnchor --> container.leadingAnchor - 8)
+                constraints.append(leadingAnchor --> targetView.trailingAnchor + Constants.targetDistance)
         }
 
         NSLayoutConstraint.activate(constraints)
         NSLayoutConstraint.activate([
-            container.leadingAnchor => leadingAnchor,
-            container.topAnchor => topAnchor,
+            container.leadingAnchor --> leadingAnchor,
+            container.topAnchor --> topAnchor,
             container.widthAnchor <= maxWidth,
-            trailingAnchor => container.trailingAnchor,
-            bottomAnchor => container.bottomAnchor,
+            trailingAnchor --> container.trailingAnchor,
+            bottomAnchor --> container.bottomAnchor,
             swoosh.heightAnchor == (Constants.swooshWidth / 1.5),
             swoosh.widthAnchor == Constants.swooshWidth,
         ])

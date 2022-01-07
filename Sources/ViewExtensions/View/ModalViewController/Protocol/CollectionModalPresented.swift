@@ -7,8 +7,8 @@
 
 import UIKit
 
-public protocol CollectionModalPresented: ModalPresented, UIGestureRecognizerDelegate {
+public protocol CollectionModalPresented: ModalPresented {
 
-    var _collectionView: UICollectionView! { get set }
+    var _collectionView: UICollectionView! { get }
 
 }

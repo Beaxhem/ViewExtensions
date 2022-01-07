@@ -2,34 +2,70 @@
 //  ModalPresentedCollectionViewController.swift
 //  
 //
-//  Created by Ilya Senchukov on 04.10.2021.
+//  Created by Ilya Senchukov on 07.11.2021.
 //
 
 import UIKit
 
 open class ModalPresentedCollectionViewController: UIViewController, CollectionModalPresented {
 
-    public var dragGestureRecognizer: UIPanGestureRecognizer?
+    public var modalViewController: ModalViewController?
 
-    public var _collectionView: UICollectionView!
+    open var _collectionView: UICollectionView! {
+        nil
+    }
+
+    open var contentView: UIView? {
+        nil
+    }
+
+    open var dimmingView: UIView? {
+        nil
+    }
+
+    public var contentHeight: CGFloat? {
+        didSet {
+            modalViewController?.update()
+        }
+    }
+
+    public var _contentHeight: CGFloat {
+        contentHeight ?? 0
+    }
+
+    public lazy var gestureDelegate: ModalCollectionViewDelegate = {
+        let delegate = ModalCollectionViewDelegate()
+        delegate.modalViewController = modalViewController
+        delegate.collectionView = _collectionView
+        return delegate
+    }()
+
+    open override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        contentHeight = _collectionView.collectionViewLayout.collectionViewContentSize.height
+    }
 
     open override func viewDidLoad() {
         super.viewDidLoad()
-        dragGestureRecognizer?.delegate = self
-        _collectionView.delegate = self
+        modalViewController?.dragGestureRecognizer.delegate = gestureDelegate
+        _collectionView.delegate = gestureDelegate
     }
 
 }
 
-extension ModalPresentedCollectionViewController: UIGestureRecognizerDelegate {
+public class ModalCollectionViewDelegate: NSObject, UIGestureRecognizerDelegate {
+
+    public weak var modalViewController: ModalViewController?
+    public weak var collectionView: UICollectionView?
 
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        guard let dragGestureRecognizer = dragGestureRecognizer,
+
+        guard let collectionView = collectionView,
+              let dragGestureRecognizer = modalViewController?.dragGestureRecognizer,
               dragGestureRecognizer == gestureRecognizer else {
                   return false
               }
-
-        return _collectionView.contentOffset.y <= 0
+        return collectionView.contentOffset.y <= 0
     }
 
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -38,17 +74,24 @@ extension ModalPresentedCollectionViewController: UIGestureRecognizerDelegate {
 
 }
 
-extension ModalPresentedCollectionViewController: UICollectionViewDelegate {
+extension ModalCollectionViewDelegate: UICollectionViewDelegate {
 
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard let dragGestureRecognizer = dragGestureRecognizer else {
+        guard let modalViewController = modalViewController,
+              let collectionView = collectionView else {
             return
         }
 
-        let offset = _collectionView.contentOffset.y
-        let translation = dragGestureRecognizer.translation(in: view.superview).y
-        if offset < 0 || translation > 0 {
-            _collectionView.contentOffset.y = 0
+        let offset = collectionView.contentOffset.y
+        let translation = modalViewController.dragGestureRecognizer.translation(in: collectionView.superview).y
+
+        if offset < 0 || translation > 0 || modalViewController.topOffset > modalViewController.topSafeArea {
+            collectionView.contentOffset.y = 0
+
         }
+    }
+
+    public func scrollViewDidChangeAdjustedContentInset(_ scrollView: UIScrollView) {
+        scrollView.scrollToTop()
     }
 }
