@@ -16,6 +16,13 @@ public extension UIScrollView {
         setContentOffset(newOffset, animated: false)
     }
 
+    func scrollToBottom(animated: Bool = true) {
+        let contentHeight = contentSize.height
+        let viewHeight = bounds.height
+
+        setContentOffset(.init(x: 0, y: contentHeight - viewHeight + contentInset.bottom), animated: animated)
+    }
+
     func stopScrolling() {
         isScrollEnabled = false
         isScrollEnabled = true
