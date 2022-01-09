@@ -7,9 +7,9 @@
 
 import UIKit
 
-public extension UILabel {
+extension UILabel: FontRoundable {
 
-    func setRoundedFont() {
+    public func setRoundedFont() {
         if let descriptor = font.fontDescriptor.withDesign(.rounded) {
             font = UIFont(descriptor: descriptor, size: font.pointSize)
         }
