@@ -9,6 +9,25 @@ import UIKit
 
 public extension UIView {
 
+    class func fromNib<T: UIView>() -> T {
+        // swiftlint:disable:next force_cast
+        return Bundle(for: T.self).loadNibNamed(String(describing: T.self), owner: nil, options: nil)![0] as! T
+    }
+
+}
+
+public extension UIView {
+
+    var cornerRadius: CGFloat {
+        get {
+            layer.cornerRadius
+        }
+
+        set {
+            layer.cornerRadius = newValue
+        }
+    }
+
     static func springAnimation(duration: TimeInterval,
                                 delay: CGFloat = 0,
                                 damping: CGFloat = 0.8,
@@ -57,7 +76,7 @@ public extension UIView {
     // MARK: - Layers
 
    func roundCorners(corners: CACornerMask, radius: CGFloat) {
-       layer.cornerRadius = radius
+       cornerRadius = radius
        layer.maskedCorners = corners
     }
 

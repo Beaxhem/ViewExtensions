@@ -16,25 +16,30 @@ public extension UICollectionView {
         register(cell, forCellWithReuseIdentifier: cell.reuseIdentifier)
     }
 
-    func register<T: UICollectionViewCell>(_ nibCell: T.Type, bundle: Bundle? = nil) {
-        register(
-            UINib(nibName: nibCell.reuseIdentifier, bundle: bundle),
-            forCellWithReuseIdentifier: nibCell.reuseIdentifier
-        )
-    }
-
-    func register(nibs: UICollectionViewCell.Type..., bundle: Bundle? = nil) {
-        nibs.forEach {
-            register($0, bundle: bundle)
+    func register(_ nibs: UICollectionViewCell.Type..., bundle: Bundle? = nil) {
+        nibs.forEach { nibCell in
+            register(
+                UINib(nibName: nibCell.reuseIdentifier, bundle: bundle),
+                forCellWithReuseIdentifier: nibCell.reuseIdentifier
+            )
         }
     }
 
-    func register<T: UICollectionReusableView>(_ view: T.Type, kind: String, bundle: Bundle? = nil) {
-        register(UINib(nibName: T.reuseIdentifier, bundle: bundle), forSupplementaryViewOfKind: kind, withReuseIdentifier: T.reuseIdentifier)
+    func register(supplementary: UICollectionReusableView.Type, kind: String? = nil, bundle: Bundle? = nil) {
+        register(UINib(nibName: supplementary.reuseIdentifier,
+                       bundle: bundle),
+                 forSupplementaryViewOfKind: kind ?? supplementary.reuseIdentifier,
+                 withReuseIdentifier: supplementary.reuseIdentifier)
+    }
+
+    func register(views: UICollectionReusableView.Type..., bundle: Bundle? = nil) {
+        for view in views {
+            register(supplementary: view, bundle: bundle)
+        }
     }
 
     func dequeueCell<T: UICollectionViewCell>(_ cell: T.Type, for indexPath: IndexPath) -> T {
-        dequeueReusableCell(withReuseIdentifier: T.reuseIdentifier, for: indexPath) as! T
+        dequeueReusableCell(withReuseIdentifier: cell.reuseIdentifier, for: indexPath) as! T
     }
 
     func dequeueCell<T: ViewModelContainingCell>(_ cell: T.Type, viewModel: T.VM, for indexPath: IndexPath) -> T {
@@ -55,20 +60,17 @@ public extension UICollectionView {
         return dequeueContainerCell(with: mutableVc, for: indexPath)
     }
 
-    @available(*, deprecated, message: "Use dequeueSupplementaryView() instead")
-    func dequeueHeader<T: UICollectionReusableView>(_ supplementaryView: T.Type, for indexPath: IndexPath) -> T {
-        dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: T.reuseIdentifier, for: indexPath) as! T
-    }
-
-    func dequeueSupplementaryView<T: UICollectionReusableView>(_ supplementaryView: T.Type, kind: String = UICollectionView.elementKindSectionHeader, indexPath: IndexPath) -> T {
-        dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: T.reuseIdentifier, for: indexPath) as! T
+    func dequeueSupplementaryView<T: UICollectionReusableView>(_ supplementaryView: T.Type, kind: String? = nil, indexPath: IndexPath) -> T {
+        return dequeueReusableSupplementaryView(ofKind: kind ?? supplementaryView.reuseIdentifier,
+                                                withReuseIdentifier: supplementaryView.reuseIdentifier,
+                                                for: indexPath) as! T
     }
 
     typealias ViewModelContainingSupplementaryView = UICollectionReusableView & ViewModelContainer
 
     func dequeueSupplementaryView<T: ViewModelContainingSupplementaryView>(
         _ supplementaryView: T.Type,
-        kind: String = UICollectionView.elementKindSectionHeader,
+        kind: String = T.reuseIdentifier,
         viewModel: T.VM,
         indexPath: IndexPath) -> T {
             var view = dequeueSupplementaryView(T.self, kind: kind, indexPath: indexPath)

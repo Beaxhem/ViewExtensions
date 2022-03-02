@@ -12,7 +12,7 @@ public class PopoverView: UIView {
 
     public static func defaultContainer() -> UIView {
         let container = UIView()
-        container.layer.cornerRadius = 10
+        container.cornerRadius = 10
         return container
     }
 

@@ -7,51 +7,111 @@
 
 import UIKit
 
+public struct KeyboardInfo: Equatable {
+
+    public let animationDuration: Double
+
+    public let animationCurve: UIView.AnimationCurve
+
+    public let frameBegin: CGRect
+
+    public let frameEnd: CGRect
+
+    public let isLocal: Bool
+
+    init?(_ notification: Notification) {
+        guard let userInfo: NSDictionary = notification.userInfo as NSDictionary?,
+              let keyboardAnimationCurve = (userInfo.object(forKey: UIResponder.keyboardAnimationCurveUserInfoKey) as? NSValue) as? Int,
+              let keyboardAnimationDuration = (userInfo.object(forKey: UIResponder.keyboardAnimationDurationUserInfoKey) as? NSValue) as? Double,
+              let keyboardIsLocal = (userInfo.object(forKey: UIResponder.keyboardIsLocalUserInfoKey) as? NSValue) as? Bool,
+              let keyboardFrameBegin = (userInfo.object(forKey: UIResponder.keyboardFrameBeginUserInfoKey) as? NSValue)?.cgRectValue,
+              let keyboardFrameEnd = (userInfo.object(forKey: UIResponder.keyboardFrameEndUserInfoKey) as? NSValue)?.cgRectValue else {
+                  return nil
+              }
+
+        self.animationDuration = keyboardAnimationDuration
+        var animationCurve = UIView.AnimationCurve.easeInOut
+        NSNumber(value: keyboardAnimationCurve).getValue(&animationCurve)
+        self.animationCurve = animationCurve
+        self.isLocal = keyboardIsLocal
+        self.frameBegin = keyboardFrameBegin
+        self.frameEnd = keyboardFrameEnd
+    }
+
+}
+
+public protocol KeyboardHandlerDelegate: AnyObject {
+    func keyboardWillAppear(_ info: KeyboardInfo)
+    func keyboardWillDisappear(_ info: KeyboardInfo)
+    func keyboardWillChangeFrame(_ info: KeyboardInfo)
+    func keyboardDidChangeFrame(_ info: KeyboardInfo)
+}
+
+public extension KeyboardHandlerDelegate {
+    func keyboardWillAppear(_ info: KeyboardInfo) { }
+    func keyboardWillDisappear(_ info: KeyboardInfo) { }
+    func keyboardWillChangeFrame(_ info: KeyboardInfo) { }
+    func keyboardDidChangeFrame(_ info: KeyboardInfo) { }
+}
+
 public class KeyboardHandler {
 
-    public typealias Handler = (CGRect) -> Void
+    public typealias Handler = (KeyboardInfo) -> Void
 
     public var isKeyboardShown: Bool = false
 
-    public init(willShow: @escaping Handler, willHide: @escaping Handler) {
-        keyboardWillHideSubscription(handler: willHide)
-        keyboardWillShowSubscription(handler: willShow)
+    private weak var delegate: KeyboardHandlerDelegate?
+
+    public init(delegate: KeyboardHandlerDelegate) {
+        self.delegate = delegate
+        subscribe()
     }
 
 }
 
 private extension KeyboardHandler {
 
-    func keyboardWillShowSubscription(handler: @escaping Handler) {
-        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { [weak self] notification in
-            guard let self = self,
-                  !self.isKeyboardShown,
-                  let keyboardFrame = Self.keyboardFrame(from: notification)
-            else { return }
+    @objc func keyboardWillShowSubscription(_ notification: Notification) {
+        guard !self.isKeyboardShown,
+              let info = KeyboardInfo(notification)
+        else { return }
 
-            self.isKeyboardShown = true
-            handler(keyboardFrame)
-        }
+        isKeyboardShown = true
+        delegate?.keyboardWillAppear(info)
     }
 
-    func keyboardWillHideSubscription(handler: @escaping Handler) {
-        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification,
-                                               object: nil,
-                                               queue: .main) { [weak self] notification in
-            guard let self = self,
-                  self.isKeyboardShown,
-                  let keyboardFrame = Self.keyboardFrame(from: notification)
-            else { return }
+    @objc func keyboardWillHideSubscription(_ notification: Notification) {
+        guard self.isKeyboardShown,
+              let info = KeyboardInfo(notification)
+        else { return }
 
-            self.isKeyboardShown = false
-            handler(keyboardFrame)
-        }
+        isKeyboardShown = false
+        delegate?.keyboardWillDisappear(info)
+
     }
 
-    static func keyboardFrame(from notification: Notification) -> CGRect? {
-        guard let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue
-        else { return nil }
+    @objc func keyboardWillChangeSubscription(_ notification: Notification) {
+        guard let info = KeyboardInfo(notification) else { return }
+        self.delegate?.keyboardWillChangeFrame(info)
+    }
 
-        return keyboardFrame.cgRectValue
+    @objc func keyboardDidChangeSubscription(_ notification: Notification) {
+        guard let info = KeyboardInfo(notification) else { return }
+        self.delegate?.keyboardDidChangeFrame(info)
+    }
+
+    func subscribe() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(keyboardWillShowSubscription(_:)),
+                                               name: UIResponder.keyboardWillShowNotification,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(keyboardWillHideSubscription(_:)),
+                                               name: UIResponder.keyboardWillHideNotification,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(keyboardWillChangeSubscription(_:)),
+                                               name: UIResponder.keyboardWillChangeFrameNotification,
+                                               object: nil)
     }
 }

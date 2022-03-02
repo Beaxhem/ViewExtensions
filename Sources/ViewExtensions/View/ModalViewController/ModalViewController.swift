@@ -12,7 +12,8 @@ public class ModalViewController: UIViewController {
     public static func present(in parent: UIViewController,
                                controller: ModalPresented,
                                contentInsets: UIEdgeInsets? = nil,
-                               animationDuration: TimeInterval = 0.3) -> ModalViewController {
+                               animationDuration: TimeInterval = 0.3,
+                               completion: (() -> Void)? = nil) -> ModalViewController {
 
         let modalViewController = ModalViewController()
 
@@ -22,9 +23,16 @@ public class ModalViewController: UIViewController {
         modalViewController.contentInsets = contentInsets ?? Self.defaultContentInsets
         modalViewController.animationDuration = animationDuration
         modalViewController.rootViewController = controller
+        modalViewController.completion = completion
 
         modalViewController.beginAppearanceTransition(true, animated: true)
-        modalViewController.moveAndFit(to: parent.navigationController ?? parent)
+        if let navigationController = parent.navigationController {
+            navigationController.interactivePopGestureRecognizer?.isEnabled = false
+            modalViewController.moveAndFit(to: navigationController)
+        } else {
+            modalViewController.moveAndFit(to: parent)
+        }
+
         
         return modalViewController
     }
@@ -54,7 +62,7 @@ public class ModalViewController: UIViewController {
     private lazy var dragIndicator: UIView = {
         let dragIndicator = UIView()
         dragIndicator.backgroundColor = .lightGray
-        dragIndicator.layer.cornerRadius = 2.5
+        dragIndicator.cornerRadius = 2.5
         dragIndicator.translatesAutoresizingMaskIntoConstraints = false
         return dragIndicator
     }()
@@ -80,6 +88,8 @@ public class ModalViewController: UIViewController {
     private var contentViewConstraints: Constraints?
 
     private var dragIndicatorConstraints: Constraints?
+
+    private var completion: (() -> Void)?
 
     public var contentInsets: UIEdgeInsets! {
         didSet {
@@ -110,7 +120,7 @@ public class ModalViewController: UIViewController {
 
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        dismissModal()
+        dismissModal(animated: animated)
     }
 
     public override func viewWillAppear(_ animated: Bool) {
@@ -129,6 +139,17 @@ public class ModalViewController: UIViewController {
 }
 
 public extension ModalViewController {
+
+    func updateWithSpring(duration: TimeInterval = 0.2, animated: Bool = true) {
+        if animated {
+            UIView.springAnimation(duration: duration) { [weak self] in
+                self?.setupConstraints()
+                self?.view.layoutIfNeeded()
+            }
+        } else {
+            setupConstraints()
+        }
+    }
 
     func update(duration: TimeInterval = 0.2, animated: Bool = true) {
         if animated {
@@ -157,20 +178,31 @@ public extension ModalViewController {
         }
     }
 
-    @objc func dismissModal() {
-        isAnimating = true
-        UIView.animate(withDuration: animationDuration) { [weak self] in
-            guard let self = self else { return }
-            self.contentViewConstraints?.update(top: self.view.frame.height)
-            self.dimmingView.layer.opacity = 0
-            self.view.layoutIfNeeded()
-        } completion: { [weak self] tset in
-            self?.isAnimating = false
-            self?.rootViewController.remove()
-            self?.rootViewController = nil
-            self?.willMove(toParent: nil)
-            self?.remove()
+    @objc func dismissModal(animated: Bool = true) {
+        func dismiss() {
+            isAnimating = true
+            UIView.animate(withDuration: animationDuration) { [weak self] in
+                guard let self = self else { return }
+                self.contentViewConstraints?.update(top: self.view.frame.height)
+                self.dimmingView.layer.opacity = 0
+                self.view.layoutIfNeeded()
+            } completion: { [weak self] _ in
+                self?.completion?()
+                self?.isAnimating = false
+                self?.rootViewController.remove()
+                self?.rootViewController = nil
+                self?.willMove(toParent: nil)
+                self?.remove()
+            }
+        }   
+        if animated {
+            dismiss()
+        } else {
+            UIView.performWithoutAnimation {
+                dismiss()
+            }
         }
+
     }
 
     @objc func onDrag(sender: UIPanGestureRecognizer) {

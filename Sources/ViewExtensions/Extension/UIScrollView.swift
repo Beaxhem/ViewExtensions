@@ -16,10 +16,9 @@ public extension UIScrollView {
         setContentOffset(newOffset, animated: false)
     }
 
-    func scrollToBottom(animated: Bool = true) {
+    @objc func scrollToBottom(animated: Bool = true) {
         let contentHeight = contentSize.height
         let viewHeight = bounds.height
-
         setContentOffset(.init(x: 0, y: contentHeight - viewHeight + contentInset.bottom), animated: animated)
     }
 
@@ -30,3 +29,17 @@ public extension UIScrollView {
 
 }
 
+public extension UICollectionView {
+
+    override func scrollToBottom(animated: Bool = true) {
+        let contentHeight = collectionViewLayout.collectionViewContentSize.height
+        let viewHeight = bounds.height
+        print("scroll", contentHeight)
+        if contentHeight > viewHeight {
+            setContentOffset(.init(x: 0,
+                                   y: contentHeight - viewHeight + contentInset.bottom),
+                             animated: animated)
+        }
+    }
+
+}
