@@ -67,6 +67,10 @@ public class KeyboardHandler {
         subscribe()
     }
 
+	deinit {
+		NotificationCenter.default.removeObserver(self)
+	}
+
 }
 
 private extension KeyboardHandler {
