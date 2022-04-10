@@ -43,6 +43,9 @@ public extension UIViewController {
     func remove() {
         view.removeFromSuperview()
         removeFromParent()
+        if isBeingDismissed {
+            endAppearanceTransition()
+        }
     }
 
 }
