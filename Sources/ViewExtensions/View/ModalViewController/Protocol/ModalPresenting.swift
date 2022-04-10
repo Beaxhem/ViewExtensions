@@ -7,6 +7,6 @@
 
 import UIKit
 
-public protocol ModalPresenting {
+public protocol ModalPresenting: UIViewController {
     var modalViewController: ModalViewController? { get set }
 }

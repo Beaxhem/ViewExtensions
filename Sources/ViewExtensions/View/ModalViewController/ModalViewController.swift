@@ -9,55 +9,37 @@ import UIKit
 
 public class ModalViewController: UIViewController {
 
+    @discardableResult
     public static func present(in parent: UIViewController,
                                controller: ModalPresented,
                                contentInsets: UIEdgeInsets? = nil,
-                               animationDuration: TimeInterval = 0.3,
+                               animationDuration: TimeInterval = 0.4,
                                completion: (() -> Void)? = nil) -> ModalViewController {
 
         let modalViewController = ModalViewController()
 
         controller.modalViewController = modalViewController
-        modalViewController.dimmingView = controller.dimmingView ?? Self.defaultDimmingView
-        modalViewController.contentView = controller.contentView ?? Self.defaultContentView
-        modalViewController.contentInsets = contentInsets ?? Self.defaultContentInsets
+        modalViewController.dimmingView = controller.dimmingView ?? Constants.defaultDimmingView
+        modalViewController.contentView = controller.contentView ?? Constants.defaultContentView
+        modalViewController.contentInsets = contentInsets ?? Constants.defaultContentInsets
         modalViewController.animationDuration = animationDuration
         modalViewController.rootViewController = controller
         modalViewController.completion = completion
+		modalViewController.parentVC = parent
 
-        modalViewController.beginAppearanceTransition(true, animated: true)
         if let navigationController = parent.navigationController {
             navigationController.interactivePopGestureRecognizer?.isEnabled = false
             modalViewController.moveAndFit(to: navigationController)
         } else {
             modalViewController.moveAndFit(to: parent)
         }
-
+		
+		modalViewController.beginAppearanceTransition(true, animated: true)
         
         return modalViewController
     }
 
-    private static var defaultContentView: UIView = {
-        let contentView = UIView()
-        contentView.backgroundColor = .systemBackground
-        contentView.clipsToBounds = true
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.roundCorners(corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner],
-                                 radius: Constants.cornerRadius)
-        return contentView
-    }()
-
-    private static var defaultDimmingView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .black.withAlphaComponent(0.2)
-        return view
-    }()
-
-    private static let defaultContentInsets = UIEdgeInsets(top: 20, left: 0, bottom: 20, right: 0)
-
     public lazy var maxHeight: CGFloat = view.frame.height - topSafeArea
-
-    public var isAnimating = false
 
     private lazy var dragIndicator: UIView = {
         let dragIndicator = UIView()
@@ -67,7 +49,15 @@ public class ModalViewController: UIViewController {
         return dragIndicator
     }()
 
-    private lazy var dismissTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissModal))
+	public weak var parentVC: UIViewController?
+
+	public override var childForStatusBarStyle: UIViewController? {
+		rootViewController
+	}
+
+	public override var preferredStatusBarStyle: UIStatusBarStyle {
+		rootViewController?.preferredStatusBarStyle ?? parentVC?.preferredStatusBarStyle ?? .default
+	}
 
     public lazy var dragGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(onDrag))
 
@@ -91,6 +81,10 @@ public class ModalViewController: UIViewController {
 
     private var completion: (() -> Void)?
 
+	public var isAnimating = false
+
+	public var isDismissing: Bool = false
+
     public var contentInsets: UIEdgeInsets! {
         didSet {
             guard let _ = rootViewControllerContraints else { return }
@@ -110,30 +104,19 @@ public class ModalViewController: UIViewController {
 
     override public func viewDidLoad() {
         super.viewDidLoad()
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.layer.masksToBounds = true
         setupView()
         setupConstraints()
-        dimmingView.addGestureRecognizer(dismissTapGestureRecognizer)
-        rootViewController.view.addGestureRecognizer(dragGestureRecognizer)
+		setupGestureRecognizers()
     }
+
+	public override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+		showModal()
+	}
 
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         dismissModal(animated: animated)
-    }
-
-    public override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        showModal()
-    }
-
-    func setupView() {
-        view.addSubview(dimmingView)
-        view.fit(dimmingView)
-        view.addSubview(contentView)
-        rootViewController?.move(to: self, viewPath: \.contentView)
-        view.addSubview(dragIndicator)
     }
 
 }
@@ -162,37 +145,27 @@ public extension ModalViewController {
         }
     }
 
-    func showModal() {
-        dimmingView.layer.opacity = 0
-        contentViewConstraints?.update(top: view.frame.height)
-        view.layoutIfNeeded()
-        isAnimating = true
-        UIView.springAnimation(duration: animationDuration) { [weak self] in
-            guard let self = self else { return }
-            self.contentViewConstraints?.update(top: self.initialTopOffset)
-            self.dimmingView.layer.opacity = 1
-            self.view.layoutIfNeeded()
-        } completion: { [weak self] in
-            self?.isAnimating = false
-            self?.endAppearanceTransition()
-        }
-    }
-
-    @objc func dismissModal(animated: Bool = true) {
+    @objc func dismissModal(animated: Bool = true, completion: (() -> Void)? = nil) {
         func dismiss() {
+            self.completion?()
             isAnimating = true
+			isDismissing = true
+            rootViewController?.beginAppearanceTransition(false, animated: true)
             UIView.animate(withDuration: animationDuration) { [weak self] in
                 guard let self = self else { return }
                 self.contentViewConstraints?.update(top: self.view.frame.height)
                 self.dimmingView.layer.opacity = 0
                 self.view.layoutIfNeeded()
             } completion: { [weak self] _ in
-                self?.completion?()
+                completion?()
                 self?.isAnimating = false
-                self?.rootViewController.remove()
+                self?.rootViewController?.remove()
                 self?.rootViewController = nil
-                self?.willMove(toParent: nil)
+				UIView.animate(withDuration: 0.1) { [weak self] in
+					self?.parentVC?.setNeedsStatusBarAppearanceUpdate()
+				}
                 self?.remove()
+				self?.didMove(toParent: nil)
             }
         }   
         if animated {
@@ -202,35 +175,81 @@ public extension ModalViewController {
                 dismiss()
             }
         }
-
     }
 
-    @objc func onDrag(sender: UIPanGestureRecognizer) {
-        switch sender.state {
-            case .began:
-                initialTopOffset = contentViewConstraints!.topConstraint!.constant
-            case .changed:
-                let translationY = sender.translation(in: view).y / 2
-                let newOffset = initialTopOffset + translationY
-                contentViewConstraints?.update(top: max(newOffset, topSafeArea))
-                delegate?.didScroll?(offsetY: translationY)
-            case .ended:
-                let translationY = sender.translation(in: view).y
-                let velocityY = sender.velocity(in: view).y
-                if translationY > rootViewController.view.frame.height / 2
-                    || (velocityY > Constants.dismissVelocity && translationY > 100) {
-                    dismissModal()
-                } else {
-                    self.contentViewConstraints?.update(top: initialTopOffset)
-                    UIView.animate(withDuration: animationDuration) { [weak self] in
-                        self?.view.superview?.layoutIfNeeded()
-                    }
-                }
-                delegate?.didEndScroll?(offsetY: translationY)
-            default:
-                break
-        }
-    }
+}
+
+private extension ModalViewController {
+
+	func setupView() {
+		contentView.translatesAutoresizingMaskIntoConstraints = false
+		contentView.layer.masksToBounds = true
+		view.addSubview(dimmingView)
+		view.fit(dimmingView)
+		view.addSubview(contentView)
+		view.addSubview(dragIndicator)
+		rootViewController?.move(to: self, viewPath: \.contentView)
+		view.insetsLayoutMarginsFromSafeArea = false
+	}
+
+	func setupGestureRecognizers() {
+		let dismissTapGestureRecognizer = UITapGestureRecognizer(target: self,
+																 action: #selector(tapOutsideModal))
+		dimmingView.addGestureRecognizer(dismissTapGestureRecognizer)
+		rootViewController.view.addGestureRecognizer(dragGestureRecognizer)
+	}
+
+}
+
+private extension ModalViewController {
+
+	func showModal() {
+		dimmingView.layer.opacity = 0
+		contentViewConstraints?.update(top: view.frame.height)
+		view.layoutIfNeeded()
+		isAnimating = true
+		UIView.springAnimation(duration: animationDuration, options: [.curveEaseIn]) { [weak self] in
+			guard let self = self else { return }
+			self.contentViewConstraints?.update(top: self.initialTopOffset)
+			self.dimmingView.layer.opacity = 1
+			self.view.layoutIfNeeded()
+		} completion: { [weak self] in
+			self?.parentVC?.setNeedsStatusBarAppearanceUpdate()
+			self?.isAnimating = false
+			self?.endAppearanceTransition()
+		}
+	}
+
+	@objc func tapOutsideModal() {
+		dismissModal(animated: true)
+	}
+
+	@objc func onDrag(sender: UIPanGestureRecognizer) {
+		switch sender.state {
+			case .began:
+				initialTopOffset = contentViewConstraints!.topConstraint!.constant
+			case .changed:
+				let translationY = sender.translation(in: view).y / 2
+				let newOffset = initialTopOffset + translationY
+				contentViewConstraints?.update(top: max(newOffset, topSafeArea))
+				delegate?.didScroll?(offsetY: translationY)
+			case .ended:
+				let translationY = sender.translation(in: view).y
+				let velocityY = sender.velocity(in: view).y
+				if translationY > rootViewController.view.frame.height / 2
+					|| (velocityY > Constants.dismissVelocity && translationY > 100) {
+					dismissModal()
+				} else {
+					self.contentViewConstraints?.update(top: initialTopOffset)
+					UIView.animate(withDuration: animationDuration) { [weak self] in
+						self?.view.superview?.layoutIfNeeded()
+					}
+				}
+				delegate?.didEndScroll?(offsetY: translationY)
+			default:
+				break
+		}
+	}
 
 }
 
@@ -291,6 +310,24 @@ private extension ModalViewController {
             static let height: CGFloat = 5
             static let spacing: CGFloat = 10
         }
+
+		static let defaultContentInsets = UIEdgeInsets(top: 20, left: 0, bottom: 20, right: 0)
+
+		static var defaultContentView: UIView = {
+			let contentView = UIView()
+			contentView.backgroundColor = .systemBackground
+			contentView.clipsToBounds = true
+			contentView.translatesAutoresizingMaskIntoConstraints = false
+			contentView.roundCorners(corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner],
+									 radius: Constants.cornerRadius)
+			return contentView
+		}()
+
+		static var defaultDimmingView: UIView = {
+			let view = UIView()
+			view.backgroundColor = .black.withAlphaComponent(0.2)
+			return view
+		}()
 
     }
 
