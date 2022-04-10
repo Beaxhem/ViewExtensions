@@ -75,9 +75,29 @@ public extension UIView {
 
     // MARK: - Layers
 
+
    func roundCorners(corners: CACornerMask, radius: CGFloat) {
        cornerRadius = radius
        layer.maskedCorners = corners
     }
+
+	func roundCorners(corners: UIRectCorner, radius: CGFloat) {
+		var cornerMask: CACornerMask
+
+		switch corners {
+			case .topLeft:
+				cornerMask = .layerMinXMinYCorner
+			case .topRight:
+				cornerMask = .layerMaxXMinYCorner
+			case .bottomLeft:
+				cornerMask = .layerMinXMaxYCorner
+			case .bottomRight:
+				cornerMask = .layerMaxXMaxYCorner
+			default:
+				cornerMask = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner, .layerMaxXMinYCorner, .layerMinXMinYCorner]
+		}
+
+		roundCorners(corners: cornerMask, radius: radius)
+	}
 
 }

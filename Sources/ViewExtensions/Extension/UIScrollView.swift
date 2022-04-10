@@ -34,7 +34,6 @@ public extension UICollectionView {
     override func scrollToBottom(animated: Bool = true) {
         let contentHeight = collectionViewLayout.collectionViewContentSize.height
         let viewHeight = bounds.height
-        print("scroll", contentHeight)
         if contentHeight > viewHeight {
             setContentOffset(.init(x: 0,
                                    y: contentHeight - viewHeight + contentInset.bottom),
