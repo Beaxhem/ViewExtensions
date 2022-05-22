@@ -53,7 +53,7 @@ open class ModalPresentedCollectionViewController: UIViewController, CollectionM
 
 }
 
-public class ModalCollectionViewDelegate: NSObject, UIGestureRecognizerDelegate {
+open class ModalCollectionViewDelegate: NSObject, UIGestureRecognizerDelegate {
 
     public weak var modalViewController: ModalViewController?
     public weak var collectionView: UICollectionView?

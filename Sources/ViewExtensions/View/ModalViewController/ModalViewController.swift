@@ -43,7 +43,7 @@ public class ModalViewController: UIViewController {
 
     private lazy var dragIndicator: UIView = {
         let dragIndicator = UIView()
-        dragIndicator.backgroundColor = .lightGray
+		dragIndicator.backgroundColor = .init(hex: "#EDF2F3")
         dragIndicator.cornerRadius = 2.5
         dragIndicator.translatesAutoresizingMaskIntoConstraints = false
         return dragIndicator
@@ -104,8 +104,8 @@ public class ModalViewController: UIViewController {
 
     override public func viewDidLoad() {
         super.viewDidLoad()
-        setupView()
-        setupConstraints()
+		setupView()
+		setupConstraints()
 		setupGestureRecognizers()
     }
 
@@ -144,6 +144,16 @@ public extension ModalViewController {
             setupConstraints()
         }
     }
+
+	func setViewController(_ vc: ModalPresented!) {
+		rootViewController?.remove()
+		rootViewControllerContraints = nil
+		rootViewController = vc
+		vc.modalViewController = self
+		setupView()
+		setupGestureRecognizers()
+		updateWithSpring()
+	}
 
     @objc func dismissModal(animated: Bool = true, completion: (() -> Void)? = nil) {
         func dismiss() {
@@ -184,10 +194,12 @@ private extension ModalViewController {
 	func setupView() {
 		contentView.translatesAutoresizingMaskIntoConstraints = false
 		contentView.layer.masksToBounds = true
-		view.addSubview(dimmingView)
-		view.fit(dimmingView)
-		view.addSubview(contentView)
-		view.addSubview(dragIndicator)
+		if !view.subviews.contains(where: { $0 == dimmingView }) {
+			view.addSubview(dimmingView)
+			view.fit(dimmingView)
+			view.addSubview(contentView)
+			view.addSubview(dragIndicator)
+		}
 		rootViewController?.move(to: self, viewPath: \.contentView)
 		view.insetsLayoutMarginsFromSafeArea = false
 	}
