@@ -168,13 +168,14 @@ public extension ModalViewController {
                 self.view.layoutIfNeeded()
             } completion: { [weak self] _ in
                 completion?()
+				let parent = self?.parentVC
                 self?.isAnimating = false
                 self?.rootViewController?.remove()
                 self?.rootViewController = nil
-				UIView.animate(withDuration: 0.1) { [weak self] in
-					self?.parentVC?.setNeedsStatusBarAppearanceUpdate()
+				self?.remove()
+				UIView.animate(withDuration: 0.1) { [weak parent] in
+					parent?.setNeedsStatusBarAppearanceUpdate()
 				}
-                self?.remove()
 				self?.didMove(toParent: nil)
             }
         }   
@@ -226,7 +227,9 @@ private extension ModalViewController {
 			self.dimmingView.layer.opacity = 1
 			self.view.layoutIfNeeded()
 		} completion: { [weak self] in
-			self?.parentVC?.setNeedsStatusBarAppearanceUpdate()
+			UIView.animate(withDuration: 0.1) { [weak self] in
+				self?.parentVC?.setNeedsStatusBarAppearanceUpdate()
+			}
 			self?.isAnimating = false
 			self?.endAppearanceTransition()
 		}
