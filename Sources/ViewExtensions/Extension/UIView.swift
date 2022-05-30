@@ -18,15 +18,32 @@ public extension UIView {
 
 public extension UIView {
 
-    var cornerRadius: CGFloat {
-        get {
-            layer.cornerRadius
-        }
+	// MARK: - Corners
 
-        set {
-            layer.cornerRadius = newValue
-        }
-    }
+	var cornerRadius: CGFloat {
+		get {
+			layer.cornerRadius
+		}
+
+		set {
+			layer.cornerRadius = newValue
+		}
+	}
+
+	func roundCorners(corners: CACornerMask, radius: CGFloat) {
+		cornerRadius = radius
+		layer.maskedCorners = corners
+	}
+
+	func roundCorners(corners: UIRectCorner, radius: CGFloat) {
+		roundCorners(corners: CACornerMask(rawValue: corners.rawValue), radius: radius)
+	}
+
+	func roundToCircle() {
+		roundCorners(corners: .allCorners, radius: bounds.height / 2)
+	}
+
+	// MARK: - Animation
 
     static func springAnimation(duration: TimeInterval,
                                 delay: CGFloat = 0,
@@ -72,17 +89,5 @@ public extension UIView {
         setNeedsLayout()
         layoutIfNeeded()
     }
-
-    // MARK: - Layers
-
-
-   func roundCorners(corners: CACornerMask, radius: CGFloat) {
-       cornerRadius = radius
-       layer.maskedCorners = corners
-    }
-
-	func roundCorners(corners: UIRectCorner, radius: CGFloat) {
-		roundCorners(corners: CACornerMask(rawValue: corners.rawValue), radius: radius)
-	}
 
 }
