@@ -20,7 +20,7 @@ public class ModalViewController: UIViewController {
 
         controller.modalViewController = modalViewController
         modalViewController.dimmingView = controller.dimmingView ?? Constants.defaultDimmingView
-        modalViewController.contentView = controller.contentView ?? Constants.defaultContentView
+		modalViewController.contentView = setupContentView(presentedController: controller)
         modalViewController.contentInsets = contentInsets ?? Constants.defaultContentInsets
         modalViewController.animationDuration = animationDuration
         modalViewController.rootViewController = controller
@@ -203,6 +203,12 @@ private extension ModalViewController {
 		}
 		rootViewController?.move(to: self, viewPath: \.contentView)
 		view.insetsLayoutMarginsFromSafeArea = false
+	}
+
+	static func setupContentView(presentedController: ModalPresented) -> UIView {
+		let view = UIView()
+		presentedController.setupContentView(view)
+		return view
 	}
 
 	func setupGestureRecognizers() {

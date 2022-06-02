@@ -15,10 +15,6 @@ open class ModalPresentedCollectionViewController: UIViewController, CollectionM
         nil
     }
 
-    open var contentView: UIView? {
-        nil
-    }
-
     open var dimmingView: UIView? {
         nil
     }
@@ -50,6 +46,8 @@ open class ModalPresentedCollectionViewController: UIViewController, CollectionM
         modalViewController?.dragGestureRecognizer.delegate = gestureDelegate
         _collectionView.delegate = gestureDelegate
     }
+
+	public func setupContentView(_ view: UIView) { }
 
 }
 

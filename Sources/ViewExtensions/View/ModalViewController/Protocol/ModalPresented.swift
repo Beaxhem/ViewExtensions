@@ -13,9 +13,9 @@ public protocol ModalPresented: UIViewController {
 
     var _contentHeight: CGFloat { get }
 
-    var contentView: UIView? { get }
-
     var dimmingView: UIView? { get }
+
+	func setupContentView(_ view: UIView)
 
 }
 
