@@ -33,6 +33,7 @@ public extension UIView {
 	func roundCorners(corners: CACornerMask, radius: CGFloat) {
 		cornerRadius = radius
 		layer.maskedCorners = corners
+		layer.masksToBounds = radius > 0
 	}
 
 	func roundCorners(corners: UIRectCorner, radius: CGFloat) {
@@ -43,6 +44,27 @@ public extension UIView {
 		roundCorners(corners: .allCorners, radius: bounds.height / 2)
 	}
 
+	func roundCorners(radius: CGFloat) {
+		roundCorners(corners: .allCorners, radius: radius)
+	}
+
+	func applyRoundedPath(corners: UIRectCorner, radius: CGFloat) {
+		let path = UIBezierPath(roundedRect: bounds,
+								byRoundingCorners: corners,
+								cornerRadii: .init(width: radius,
+												   height: radius))
+		let maskLayer = CAShapeLayer()
+		maskLayer.path = path.cgPath
+		layer.mask = maskLayer
+	}
+
+	func applyRoundedPath(radius: CGFloat) {
+		applyRoundedPath(corners: .allCorners, radius: radius)
+	}
+
+	func applyRoundedPath() {
+		applyRoundedPath(radius: frame.height / 2)
+	}
 	// MARK: - Animation
 
     static func springAnimation(duration: TimeInterval,
