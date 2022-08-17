@@ -26,16 +26,9 @@ public class ModalViewController: UIViewController {
         modalViewController.rootViewController = controller
         modalViewController.completion = completion
 		modalViewController.parentVC = parent
-
-        if let navigationController = parent.navigationController {
-            navigationController.interactivePopGestureRecognizer?.isEnabled = false
-            modalViewController.moveAndFit(to: navigationController)
-        } else {
-            modalViewController.moveAndFit(to: parent)
-        }
-		
+		let parent = parent.navigationController ?? parent
+		modalViewController.moveAndFit(to: parent)
 		modalViewController.beginAppearanceTransition(true, animated: true)
-        
         return modalViewController
     }
 
@@ -79,7 +72,7 @@ public class ModalViewController: UIViewController {
 
     private var dragIndicatorConstraints: Constraints?
 
-    private var completion: (() -> Void)?
+    public var completion: (() -> Void)?
 
 	public var isAnimating = false
 
@@ -111,6 +104,7 @@ public class ModalViewController: UIViewController {
 
 	public override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
+		navigationController?.interactivePopGestureRecognizer?.isEnabled = false
 		showModal()
 	}
 
@@ -155,17 +149,20 @@ public extension ModalViewController {
 		updateWithSpring()
 	}
 
-    @objc func dismissModal(animated: Bool = true, completion: (() -> Void)? = nil) {
+	@objc func dismissModal(progress: Double = 0, animated: Bool = true, completion: (() -> Void)? = nil) {
+		navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+
         func dismiss() {
             self.completion?()
             isAnimating = true
 			isDismissing = true
             rootViewController?.beginAppearanceTransition(false, animated: true)
+			let animationDuration = animationDuration * (1 - progress)
             UIView.animate(withDuration: animationDuration) { [weak self] in
                 guard let self = self else { return }
                 self.contentViewConstraints?.update(top: self.view.frame.height)
                 self.dimmingView.layer.opacity = 0
-                self.view.layoutIfNeeded()
+				self.view.layoutSubviews()
             } completion: { [weak self] _ in
                 completion?()
 				let parent = self?.parentVC
@@ -227,15 +224,15 @@ private extension ModalViewController {
 		contentViewConstraints?.update(top: view.frame.height)
 		view.layoutIfNeeded()
 		isAnimating = true
+		UIView.animate(withDuration: 0.1) { [weak self] in
+			self?.parentVC?.setNeedsStatusBarAppearanceUpdate()
+		}
 		UIView.springAnimation(duration: animationDuration, options: [.curveEaseIn]) { [weak self] in
 			guard let self = self else { return }
 			self.contentViewConstraints?.update(top: self.initialTopOffset)
 			self.dimmingView.layer.opacity = 1
-			self.view.layoutIfNeeded()
+			self.view.layoutSubviews()
 		} completion: { [weak self] in
-			UIView.animate(withDuration: 0.1) { [weak self] in
-				self?.parentVC?.setNeedsStatusBarAppearanceUpdate()
-			}
 			self?.isAnimating = false
 			self?.endAppearanceTransition()
 		}
@@ -259,7 +256,7 @@ private extension ModalViewController {
 				let velocityY = sender.velocity(in: view).y
 				if translationY > rootViewController.view.frame.height / 2
 					|| (velocityY > Constants.dismissVelocity && translationY > 100) {
-					dismissModal()
+					dismissModal(progress: initialTopOffset / translationY)
 				} else {
 					self.contentViewConstraints?.update(top: initialTopOffset)
 					UIView.animate(withDuration: animationDuration) { [weak self] in
