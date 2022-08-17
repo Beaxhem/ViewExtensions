@@ -96,12 +96,12 @@ private extension KeyboardHandler {
 
     @objc func keyboardWillChangeSubscription(_ notification: Notification) {
         guard let info = KeyboardInfo(notification) else { return }
-        self.delegate?.keyboardWillChangeFrame(info)
+        delegate?.keyboardWillChangeFrame(info)
     }
 
     @objc func keyboardDidChangeSubscription(_ notification: Notification) {
         guard let info = KeyboardInfo(notification) else { return }
-        self.delegate?.keyboardDidChangeFrame(info)
+        delegate?.keyboardDidChangeFrame(info)
     }
 
     func subscribe() {

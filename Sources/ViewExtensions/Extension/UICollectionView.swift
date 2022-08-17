@@ -12,10 +12,12 @@ public extension UICollectionView {
     typealias ViewModelContainingCell = UICollectionViewCell & ViewModelContainer
     typealias ViewModelContainerController = UIViewController & ViewModelContainer
 
+	// Register UICollectionViewCell
     func registerCell<T: UICollectionViewCell>(_ cell: T.Type) {
         register(cell, forCellWithReuseIdentifier: cell.reuseIdentifier)
     }
 
+	// Register nib for UICollectionViewCell
     func register(_ nibs: UICollectionViewCell.Type..., bundle: Bundle? = nil) {
         nibs.forEach { nibCell in
             register(
@@ -25,6 +27,7 @@ public extension UICollectionView {
         }
     }
 
+	// Register reusable view (header, footer, etc)
     func register(supplementary: UICollectionReusableView.Type, kind: String? = nil, bundle: Bundle? = nil) {
         register(UINib(nibName: supplementary.reuseIdentifier,
                        bundle: bundle),
@@ -32,6 +35,7 @@ public extension UICollectionView {
                  withReuseIdentifier: supplementary.reuseIdentifier)
     }
 
+	// Register multiple reusable views (headers, footers, etc)
     func register(views: UICollectionReusableView.Type..., bundle: Bundle? = nil) {
         for view in views {
             register(supplementary: view, bundle: bundle)
@@ -61,9 +65,9 @@ public extension UICollectionView {
     }
 
     func dequeueSupplementaryView<T: UICollectionReusableView>(_ supplementaryView: T.Type, kind: String? = nil, indexPath: IndexPath) -> T {
-        return dequeueReusableSupplementaryView(ofKind: kind ?? supplementaryView.reuseIdentifier,
-                                                withReuseIdentifier: supplementaryView.reuseIdentifier,
-                                                for: indexPath) as! T
+        dequeueReusableSupplementaryView(ofKind: kind ?? supplementaryView.reuseIdentifier,
+										 withReuseIdentifier: supplementaryView.reuseIdentifier,
+										 for: indexPath) as! T
     }
 
     typealias ViewModelContainingSupplementaryView = UICollectionReusableView & ViewModelContainer
