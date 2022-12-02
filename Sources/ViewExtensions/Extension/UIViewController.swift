@@ -29,6 +29,11 @@ public extension UIViewController {
 
     // MARK: Layout
 
+	func moveTo(parent: UIViewController?) {
+		parent?.addChild(self)
+		didMove(toParent: parent)
+	}
+
     func move<T: UIViewController>(to parent: T, viewPath: KeyPath<T, UIView> = \.view) {
         parent.addChild(self)
         parent[keyPath: viewPath].addSubview(self.view)

@@ -12,12 +12,12 @@ public extension UICollectionView {
     typealias ViewModelContainingCell = UICollectionViewCell & ViewModelContainer
     typealias ViewModelContainerController = UIViewController & ViewModelContainer
 
-	// Register UICollectionViewCell
+	/// Register UICollectionViewCell
     func registerCell<T: UICollectionViewCell>(_ cell: T.Type) {
         register(cell, forCellWithReuseIdentifier: cell.reuseIdentifier)
     }
 
-	// Register nib for UICollectionViewCell
+	/// Register nib for UICollectionViewCell
     func register(_ nibs: UICollectionViewCell.Type..., bundle: Bundle? = nil) {
         nibs.forEach { nibCell in
             register(
@@ -27,7 +27,7 @@ public extension UICollectionView {
         }
     }
 
-	// Register reusable view (header, footer, etc)
+	/// Register reusable view (header, footer, etc)
     func register(supplementary: UICollectionReusableView.Type, kind: String? = nil, bundle: Bundle? = nil) {
         register(UINib(nibName: supplementary.reuseIdentifier,
                        bundle: bundle),
@@ -35,7 +35,7 @@ public extension UICollectionView {
                  withReuseIdentifier: supplementary.reuseIdentifier)
     }
 
-	// Register multiple reusable views (headers, footers, etc)
+	/// Register multiple reusable views (headers, footers, etc)
     func register(views: UICollectionReusableView.Type..., bundle: Bundle? = nil) {
         for view in views {
             register(supplementary: view, bundle: bundle)
@@ -81,5 +81,13 @@ public extension UICollectionView {
             view.viewModel = viewModel
             return view
         }
+
+}
+
+public extension UICollectionView {
+
+	func supplementaryView<T: UICollectionReusableView>(ofType: T.Type, at indexPath: IndexPath) -> T? {
+		supplementaryView(forElementKind: T.reuseIdentifier, at: indexPath) as? T
+	}
 
 }

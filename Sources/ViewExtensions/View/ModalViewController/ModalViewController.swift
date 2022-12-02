@@ -110,7 +110,7 @@ public class ModalViewController: UIViewController {
 
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        dismissModal(animated: animated)
+//        dismissModal(animated: animated)
     }
 
 }
@@ -247,9 +247,12 @@ private extension ModalViewController {
 			case .began:
 				initialTopOffset = contentViewConstraints!.topConstraint!.constant
 			case .changed:
-				let translationY = sender.translation(in: view).y / 2
+				let translationY = sender.translation(in: view).y
 				let newOffset = initialTopOffset + translationY
-				contentViewConstraints?.update(top: max(newOffset, topSafeArea))
+				UIView.animate(withDuration: 1, delay: 0, options: [.curveEaseIn]) { [weak self] in
+					guard let topSafeArea = self?.topSafeArea else { return }
+					self?.contentViewConstraints?.update(top: max(newOffset, topSafeArea))
+				}
 				delegate?.didScroll?(offsetY: translationY)
 			case .ended:
 				let translationY = sender.translation(in: view).y
