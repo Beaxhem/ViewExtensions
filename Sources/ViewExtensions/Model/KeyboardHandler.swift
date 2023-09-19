@@ -40,6 +40,7 @@ public struct KeyboardInfo: Equatable {
 
 }
 
+@MainActor
 public protocol KeyboardHandlerDelegate: AnyObject {
     func keyboardWillAppear(_ info: KeyboardInfo)
     func keyboardWillDisappear(_ info: KeyboardInfo)
@@ -54,6 +55,7 @@ public extension KeyboardHandlerDelegate {
     func keyboardDidChangeFrame(_ info: KeyboardInfo) { }
 }
 
+@MainActor
 public class KeyboardHandler {
 
     public typealias Handler = (KeyboardInfo) -> Void

@@ -7,6 +7,7 @@
 
 import UIKit
 
+@MainActor
 public protocol ViewModelContainer {
 
     associatedtype VM: ViewModel
