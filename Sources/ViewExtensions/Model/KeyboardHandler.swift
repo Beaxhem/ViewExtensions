@@ -19,7 +19,7 @@ public struct KeyboardInfo: Equatable {
 
     public let isLocal: Bool
 
-    init?(_ notification: Notification) {
+    public init?(_ notification: Notification) {
         guard let userInfo: NSDictionary = notification.userInfo as NSDictionary?,
               let keyboardAnimationCurve = (userInfo.object(forKey: UIResponder.keyboardAnimationCurveUserInfoKey) as? NSValue) as? Int,
               let keyboardAnimationDuration = (userInfo.object(forKey: UIResponder.keyboardAnimationDurationUserInfoKey) as? NSValue) as? Double,

@@ -9,11 +9,10 @@ import UIKit
 
 public extension UIScrollView {
 
-    func scrollToTop() {
+    func scrollToTop(animated: Bool = false) {
         var newOffset = contentOffset
-        newOffset.y = 0
-
-        setContentOffset(newOffset, animated: false)
+        newOffset.y = -contentInset.top
+        setContentOffset(newOffset, animated: animated)
     }
 
     @objc func scrollToBottom(animated: Bool = true) {
