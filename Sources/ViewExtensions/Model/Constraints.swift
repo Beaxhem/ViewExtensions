@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class Constraints {
+@MainActor final class Constraints {
 
     var topConstraint: NSLayoutConstraint?
     var leadingConstraint: NSLayoutConstraint?

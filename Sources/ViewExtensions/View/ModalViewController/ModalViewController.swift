@@ -319,7 +319,7 @@ private extension ModalViewController {
 
 private extension ModalViewController {
 
-    enum Constants {
+    @MainActor enum Constants {
 
         static let cornerRadius: CGFloat = 40
         static let additionalTopSpace: CGFloat = 30

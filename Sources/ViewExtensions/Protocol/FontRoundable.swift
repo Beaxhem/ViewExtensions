@@ -7,6 +7,6 @@
 
 import Foundation
 
-public protocol FontRoundable {
+@MainActor public protocol FontRoundable {
     func setRoundedFont()
 }
