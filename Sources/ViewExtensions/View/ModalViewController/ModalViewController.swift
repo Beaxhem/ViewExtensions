@@ -36,7 +36,6 @@ public class ModalViewController: UIViewController {
 
     private lazy var dragIndicator: UIView = {
         let dragIndicator = UIView()
-		dragIndicator.backgroundColor = .init(hex: "#EDF2F3")
         dragIndicator.cornerRadius = 2.5
         dragIndicator.translatesAutoresizingMaskIntoConstraints = false
         return dragIndicator

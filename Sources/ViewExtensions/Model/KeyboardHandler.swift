@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 public struct KeyboardInfo: Equatable {
 
@@ -120,4 +121,33 @@ private extension KeyboardHandler {
                                                name: UIResponder.keyboardWillChangeFrameNotification,
                                                object: nil)
     }
+}
+
+public extension KeyboardInfo {
+
+    @MainActor
+    var animation: Animation {
+        let timing = UICubicTimingParameters(animationCurve: animationCurve)
+        if let springParams = timing.springTimingParameters,
+           let mass = springParams.mass, let stiffness = springParams.stiffness, let damping = springParams.damping {
+            return Animation.interpolatingSpring(mass: mass, stiffness: stiffness, damping: damping)
+        } else {
+            return Animation.easeOut(duration: animationDuration) // this is the closest fallback
+        }
+    }
+
+}
+
+public extension UISpringTimingParameters {
+
+    var mass: Double? {
+        value(forKey: "mass") as? Double
+    }
+    var stiffness: Double? {
+        value(forKey: "stiffness") as? Double
+    }
+    var damping: Double? {
+        value(forKey: "damping") as? Double
+    }
+
 }
